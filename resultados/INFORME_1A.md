@@ -21,7 +21,7 @@ queda vacío, el modelo final se reduce a la media histórica y los criterios de
 | 5 Sombras | 1.000 (etapa 1), 100 (etapa 2), 100 del objetivo |
 | 6 Etapa 1 | 0 de 14 pasan, ni global ni por régimen |
 | 7 Etapa 2 | Solo las excepciones F03, F06, F13: ninguna cumple |
-| 8 Nula del procedimiento | __NULA_ESTADO__ |
+| 8 Nula del procedimiento | Hecho: 100 corridas, 0 variables estables en todas |
 | 9 Catálogo congelado | Vacío (`04_catalogo_1A.csv`) |
 | 10 Validación 2019-2022 | R² OOS = 0 por construcción; DSR y PBO no aplican |
 | 7.6 Abrir holdout | **No** |
@@ -104,11 +104,35 @@ línea 1A (etapa 1, tres modelos de etapa 2 y la validación de la media histór
 
 ## Nula del procedimiento (7.5)
 
-__NULA__
+Se desplaza y circularmente en descubrimiento (100 offsets, k ≥ 52 semanas), se ejecuta el procedimiento
+completo (etapa 1 con 1.000 sombras, etapa 2 con 100) y se valida el catálogo resultante en 2019-2022
+(`06_nula_procedimiento.csv`).
+
+| Métrica | Real | Nula: p95 | Nula: distribución |
+| --- | --- | --- | --- |
+| Nº de variables estables | 0 | 0 | 0 en las 100 corridas |
+| R² OOS validación | 0 | 0 | 0 en las 100 (catálogo siempre vacío) |
+| Sharpe neto | 0,16 | 0,16 | 0,16 (media histórica) |
+
+Dos lecturas:
+
+1. El resultado real no se distingue de la nula: es exactamente lo que da el procedimiento sobre ruido.
+2. La tasa de falsos positivos del procedimiento es 0/100 (IC 95 % de Clopper-Pearson: 0-3,6 %). Es muy
+   conservador, y eso es en sí información: sin una prueba de potencia no se puede saber si es capaz de
+   detectar un efecto del tamaño plausible en predicción de índices (R² semanal del 1-2 %).
 
 ## Criterios para abrir el holdout (7.6)
 
-__CRITERIOS__
+| Criterio | Resultado |
+| --- | --- |
+| R² OOS > 0 y Clark-West p < 0,10 | ✗ (R² = 0, CW no definido) |
+| DSR > 0,95 | ✗ (no aplica: sin configuraciones) |
+| PBO < 0,5 | ✗ (no aplica) |
+| Nº estables > p95 de la nula | ✗ (0 frente a 0) |
+| R² OOS > p95 de la nula | ✗ (0 frente a 0) |
+
+**Decisión: el holdout no se abre.** Se documenta como resultado nulo (`08_criterios_holdout.json`).
+Además, según la especificación, el holdout se abre una sola vez para 1A y 1B juntas, con ambas congeladas.
 
 ## Comprobación en la muestra corta 2017-2021 (7.8)
 
