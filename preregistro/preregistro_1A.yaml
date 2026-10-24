@@ -1,0 +1,92 @@
+# Pre-registro de la línea 1A (S&P 500, horizonte 5 sesiones)
+# Fechado antes de construir la etiqueta y (retorno futuro). Cualquier cambio en este
+# fichero cambia su hash SHA-256, que se graba en cada entrada de trials.jsonl.
+fecha: "2026-10-24"
+autor: "David Garcia (especificación); implementación con Claude Code"
+especificacion: "Líneas 1A y 1B · Especificación S&P 500 a 5 días (2026-10-22)"
+
+datos:
+  fuente: "Repositorio de Stefan Jansen, Machine Learning for Trading 3rd ed. (stefan-jansen/machine-learning-for-trading)"
+  indice: "data/equities/market/sp500/sp500.csv vía data.load_sp500_index()"
+  etfs: "data/etfs/market (Yahoo, ajustados) vía data.load_etfs(): SPY RSP HYG IEF y SPDR sectoriales"
+  cot: "CFTC TFF E-mini S&P 500 (código 13874A): 2017-2025 vía data.load_cot(['ES']); 2006-2016 del fichero histórico CFTC fin_fut_txt_2006_2016.zip con el mismo mapeo de columnas"
+  fred: "DFF, T10Y2Y, VIXCLS (fredgraph.csv; ALFRED primera publicación si existe FRED_API_KEY)"
+  fomc: "data_ref/fomc_decision_dates.csv: reuniones programadas (federalreserve.gov), día de decisión; se excluyen reuniones no programadas y conference calls"
+
+muestra:
+  inicio_datos: "2006-01-01"
+  descubrimiento: ["2007-04-01", "2018-12-31"]
+  validacion: ["2019-01-01", "2022-12-31"]
+  holdout: ["2023-01-01", "2025-12-31"]   # sellado: el código no construye y en este periodo
+  decision: "cierre del último día hábil de cada semana ISO"
+  horizonte_sesiones: 5
+  etiqueta: "y = log(P[t+5]/P[t]) - DFF[t]/100/52"
+
+volatilidad_prevista:
+  definicion: "sigma_d = ml4t.engineer ewma_volatility(close, span=17) (alpha=1/17, ~RiskMetrics 0.94); sigma_5 = sqrt(5) * sigma_d"
+
+candidatas:
+  F01: {familia: reversion, signo: -1, def: "log(P[t]/P[t-5]) / sigma_5[t]", mecanismo: "provisión de liquidez a corto plazo"}
+  F02: {familia: reversion, signo: -1, def: "(P[t] - SMA20[t]) / SD20(P)[t]", mecanismo: "provisión de liquidez"}
+  F03: {familia: tendencia, signo: 1, def: "log(P[t-21]/P[t-252])", mecanismo: "momentum de series temporales"}
+  F04: {familia: tendencia, signo: 1, def: "P[t]/SMA200[t] - 1", mecanismo: "momentum de series temporales"}
+  F05: {familia: volatilidad, signo: 1, def: "log(VIX[t]/VIX[t-5])", mecanismo: "rebote tras picos de miedo"}
+  F06: {familia: volatilidad, signo: 1, def: "(VIX[t]/100)^2 - RV21[t]^2, RV21 = ml4t realized_volatility(r, 21, anualizada)", mecanismo: "prima de riesgo de varianza"}
+  F07: {familia: volatilidad, signo: -1, def: "RV5[t] / RV21[t] (ml4t realized_volatility)", mecanismo: "estrés reciente"}
+  F08: {familia: amplitud, signo: 1, def: "log ret 20d RSP - log ret 20d SPY", mecanismo: "participación amplia"}
+  F09: {familia: amplitud, signo: -1, def: "fracción de SPDR sectoriales disponibles (XLB XLE XLF XLI XLK XLP XLU XLV XLY; XLRE desde que cotiza; XLC desde que cotiza) con cierre > SMA50; un sector entra cuando tiene 50 sesiones", mecanismo: "reversión de excesos de amplitud (se contrasta la versión monótona del signo −)"}
+  F10: {familia: credito, signo: 1, def: "log ret 5d HYG - log ret 5d IEF", mecanismo: "el crédito anticipa a la renta variable"}
+  F11: {familia: tipos, signo: 0, def: "T10Y2Y[t] - T10Y2Y[t-5]", mecanismo: "control macro sin signo previo"}
+  F12: {familia: posicionamiento, signo: -1, def: "z-score de lev_money_net (ES) sobre los 156 informes previos (mínimo 52), disponible en report_date + 3 días (viernes de publicación)", mecanismo: "el posicionamiento extremo revierte"}
+  F13: {familia: calendario, signo: 1, def: "1 si (t, t+5] contiene un día de decisión FOMC programado", mecanismo: "drift pre-FOMC"}
+  F14: {familia: calendario, signo: 1, def: "1 si (t, t+5] contiene la primera sesión de un mes natural", mecanismo: "efecto cambio de mes"}
+
+excepciones_teoricas: [F03, F06, F13]   # máximo 3; pasan a la etapa 2 aunque no pasen la etapa 1
+
+clusters:
+  metodo: "Spearman sobre el periodo analizado; enlace medio; distancia 1-|rho|; corte en distancia 0.4 (|rho| = 0.6)"
+  prioridad_representante: [F06, F01, F03, F10, F05, F12, F08, F13, F14, F07, F02, F04, F09, F11]
+
+regimenes:
+  R_vol: "1 si VIX[t] > percentil 70 de VIX en las 756 sesiones previas (sin incluir t)"
+  R_trend: "1 si P[t] > SMA200[t]"
+  minimo_semanas_celda: 30
+
+folds:
+  tipo: "walk-forward expansivo"
+  entrenamiento_desde: "2007-04-01"
+  tests: "5 bloques de igual duración natural entre 2011-01-01 y 2018-12-31"
+  purga: "se elimina del entrenamiento toda observación cuya etiqueta termine después del inicio del test"
+  embargo_semanas: 1
+
+sombras:
+  k_min_semanas: 52
+  replicas_etapa1: 1000
+  replicas_etapa2: 100
+  replicas_objetivo: 100
+  descarte_union: "se anulan las observaciones a menos de un horizonte (1 semana) del punto de unión"
+  semilla_base: 20261024
+
+etapa1:
+  newey_west_lags: "floor(4 * (n/100)^(2/9))"
+  familia: "14 candidatas x 5 cortes (global, R_vol alto, R_vol bajo, R_trend alcista, R_trend bajista) = 70 contrastes; umbral = p95 del máximo de las sombras sobre los 70"
+  stambaugh: "corrección de Stambaugh en U4 si AR(1) de x > 0.9"
+
+etapa2:
+  ridge: {alphas: "logspace(-1, 5, 31)", cv: "TimeSeriesSplit(5) interno, solo variables reales; se congela para las réplicas"}
+  elastic_net: {l1_ratio: [0.2, 0.5, 0.8], alphas: "50 automáticos", cv: "TimeSeriesSplit(5)"}
+  lightgbm: {max_depth: 3, num_leaves: 7, min_data_in_leaf: 40, learning_rate: 0.02, n_estimators: 300, feature_fraction: 0.8, sin_monotonia: true}
+  umbral: "p95 del máximo de las sombras"
+
+evaluacion:
+  reentreno: "anual, ventana expansiva desde 2007-04"
+  benchmark: "media histórica expansiva de y"
+  clark_west: "unilateral, Newey-West"
+  campbell_thompson: "predicción truncada a 0 si es negativa"
+  estrategia: "w = min(max(yhat / (3 * sigma_5^2), 0), 1.5)"
+  costes_pb_por_lado: 2
+  dsr_umbral: 0.95
+  pbo_particiones: 16
+  pbo_umbral: 0.5
+  criterios_holdout: ["R2_OOS > 0 y Clark-West p < 0.10", "DSR > 0.95 y PBO < 0.5", "valor real > p95 de la nula del procedimiento en nº de variables y en R2_OOS"]
+  holdout: "no se abre en 1A: la especificación exige congelar 1A y 1B y abrirlo una sola vez para ambas"

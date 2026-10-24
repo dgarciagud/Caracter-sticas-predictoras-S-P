@@ -1,0 +1,20 @@
+# Librerías de Stefan Jansen (ML4T 3.ª ed.)
+ml4t-data>=0.3
+ml4t-diagnostic>=0.1.9
+ml4t-engineer>=0.2
+# Resto
+polars>=1.0
+pyarrow
+pandas>=2.2
+numpy
+scipy
+statsmodels
+scikit-learn>=1.6
+lightgbm>=4.6
+shap>=0.45
+matplotlib
+pyyaml
+requests
+joblib
+yfinance
+cot_reports
