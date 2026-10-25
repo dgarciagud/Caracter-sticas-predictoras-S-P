@@ -125,8 +125,8 @@ def paso_validacion(_):
     if sospechosas and (inc or cond):
         out_s = EV.predecir(panel, inc + sospechosas, cond)
         tab_s, est_s = EV.informe(out_s, modelos=("ridge",))
-        tab_s["modelo"] = "ridge+sospechosas"
-        tabla = pd.concat([tabla, tab_s[tab_s.modelo == "ridge+sospechosas"]])
+        tab_s = tab_s[tab_s.modelo == "ridge"].assign(modelo="ridge+sospechosas")
+        tabla = pd.concat([tabla, tab_s])
         variantes["ridge+sospechosas"] = est_s["ridge"]
     for _, f in tabla[tabla.modelo.isin(configs + list(variantes))].iterrows():
         registro.registrar(
@@ -142,8 +142,13 @@ def paso_validacion(_):
     exceso.update({m: e.exceso for m, e in variantes.items()})
     n_trials = len(registro.leer("1A"))
     d = EV.dsr(exceso, n_trials)
-    pbo = EV.cscv_pbo(pd.DataFrame(exceso).dropna(), S=16)
-    json.dump(dict(dsr=d, pbo=pbo, variables=inc, condicionales=cond), open(R / "05_dsr_pbo.json", "w"), indent=2)
+    # Estrategias con retornos idénticos (p. ej. ridge y ridge_ct cuando los pesos ya se truncan en 0) son una sola
+    # configuración: se quitan los duplicados antes del PBO para que los empates no distorsionen los rangos.
+    matriz = pd.DataFrame(exceso).dropna()
+    matriz = matriz.loc[:, ~matriz.T.duplicated()]
+    pbo = EV.cscv_pbo(matriz, S=16) if matriz.shape[1] >= 2 else None
+    json.dump(dict(dsr=d, pbo=pbo, variables=inc, condicionales=cond, estrategias_pbo=list(matriz.columns)),
+              open(R / "05_dsr_pbo.json", "w"), indent=2)
     pd.DataFrame({m: (1 + e.r).cumprod() for m, e in estr.items()}).to_csv(R / "05_curvas_capital_validacion.csv")
     print(tabla.round(4).to_string(index=False))
     print(json.dumps(dict(dsr=d, pbo=pbo), indent=2))

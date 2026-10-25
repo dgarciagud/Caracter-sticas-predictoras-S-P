@@ -1,0 +1,22 @@
+{
+  "dsr": {
+    "dsr": 0.9374651690531759,
+    "sharpe_lider_anual": 0.388797995513392,
+    "n_ensayos": 29,
+    "lider": "ridge"
+  },
+  "pbo": {
+    "pbo": 0.674980574980575,
+    "n_combinaciones": 12870,
+    "n_estrategias": 3
+  },
+  "variables": [],
+  "condicionales": {
+    "F05": "R_trend=1"
+  },
+  "estrategias_pbo": [
+    "ridge",
+    "gbm",
+    "ridge+sospechosas"
+  ]
+}
