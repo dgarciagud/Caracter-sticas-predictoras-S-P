@@ -18,7 +18,8 @@ Datos y librerías del repositorio de Stefan Jansen, *Machine Learning for Tradi
 
 **Informes:** [`resultados/INFORME_1A.md`](resultados/INFORME_1A.md) (v1, peor fold, pre-registro original) y
 [`resultados/v2_mediana/INFORME_1A_v2.md`](resultados/v2_mediana/INFORME_1A_v2.md) (v2, mediana de los folds,
-reapertura del pre-registro tras ver la v1).
+reapertura del pre-registro tras ver la v1) y
+[`resultados/v3/INFORME_1A_v3.md`](resultados/v3/INFORME_1A_v3.md) (v3, criterios elegidos por potencia).
 
 Prueba de potencia de la etapa 1 (datos sintéticos): [`resultados/potencia/INFORME_POTENCIA.md`](resultados/potencia/INFORME_POTENCIA.md).
 

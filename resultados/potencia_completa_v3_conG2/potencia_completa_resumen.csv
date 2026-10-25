@@ -1,0 +1,5 @@
+variable,forma,r2,potencia_etapa1,potencia_completa,n
+F01,lineal,0.02,0.5,0.25,20
+F01,lineal,0.04,1.0,0.75,20
+F06,lineal,0.02,0.25,0.1,20
+F06,umbral,0.04,0.55,0.05,20
