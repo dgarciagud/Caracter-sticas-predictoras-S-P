@@ -176,8 +176,8 @@ def etapa1(per: Periodo, R: int = C.R1, semilla: int = C.SEMILLA, lote: int = 10
         with np.errstate(all="ignore"):
             M1[a : a + lote] = np.nanmax(u1.reshape(len(kk), -1), -1)
             M2[a : a + lote] = np.nanmax(u2.reshape(len(kk), -1), -1)
-    q1 = float(np.nanpercentile(M1, 95))
-    q2 = float(np.nanpercentile(M2, 95)) if np.isfinite(M2).any() else np.nan
+    q1 = float(np.nanpercentile(M1, C.PERCENTIL))
+    q2 = float(np.nanpercentile(M2, C.PERCENTIL)) if np.isfinite(M2).any() else np.nan
 
     filas = []
     for ci, corte in enumerate(C.CORTES):
@@ -213,6 +213,17 @@ def etapa1(per: Periodo, R: int = C.R1, semilla: int = C.SEMILLA, lote: int = 10
     tabla = tabla.merge(pd.DataFrame(u4), on="variable")
 
     return dict(tabla=tabla, q1=q1, q2=q2, M1=M1, M2=M2, folds=fl, salida=salida_etapa1(tabla, per.nombres))
+
+
+def reumbralizar_etapa1(e1: dict, percentil: float, nombres: list[str]) -> dict:
+    """Recalcula q1, q2, `pasa` y la salida 5.5 de una etapa 1 ya ejecutada con otro percentil de la nula."""
+    q1 = float(np.nanpercentile(e1["M1"], percentil))
+    q2 = float(np.nanpercentile(e1["M2"], percentil)) if np.isfinite(e1["M2"]).any() else np.nan
+    t = e1["tabla"].copy()
+    forma_ok = t.variable.isin(DUMMIES) | (C.MODO_U2 == "ninguno") | (t.U2 > q2)
+    t["pasa"] = (t.U1 > q1) & forma_ok
+    t["q1"], t["q2"] = q1, q2
+    return dict(e1, tabla=t, q1=q1, q2=q2, salida=salida_etapa1(t, nombres))
 
 
 def salida_etapa1(tabla: pd.DataFrame, nombres: list[str]) -> pd.DataFrame:

@@ -55,6 +55,8 @@ AGREGACION = PREREG.get("agregacion_folds", "min")
 MODO_U2 = PREREG.get("modo_U2", "por_fold")
 # Estadísticos que debe superar el GBM en la etapa 2 (v1, v2: G1, G2 y G3).
 CRITERIO_GBM: list[str] = list(PREREG.get("criterio_gbm", ["G1", "G2", "G3"]))
+# Percentil de la nula (máximo de las sombras) que fija todos los umbrales de las etapas 1 y 2 (v1-v4: 95).
+PERCENTIL = float(PREREG.get("percentil_umbral", 95))
 
 
 def agregar_folds(a, axis: int = -1):

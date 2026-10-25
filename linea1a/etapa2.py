@@ -17,6 +17,7 @@ from sklearn.model_selection import TimeSeriesSplit
 from . import config as C
 from .etapa1 import Periodo, folds, indices_sombra, offsets
 
+CLAVES = ["L1_ridge", "L1_enet", "G1", "G2", "G3", "I1"]
 REJILLA = np.array([-np.inf, -1.5, -1.0, -0.5, 0.0, 0.5, 1.0, 1.5, np.inf])
 ALPHAS_RIDGE = np.logspace(-1, 5, 31)
 
@@ -170,19 +171,29 @@ def etapa2(per: Periodo, dis: Diseno, R: int = C.R2, semilla: int = C.SEMILLA + 
     ks = offsets(len(per.fechas), R, semilla)
     reps = Parallel(n_jobs=n_jobs)(delayed(_replica)(per, dis, Xr, fl, hp, kk, j_sel) for kk in ks)
 
-    claves = ["L1_ridge", "L1_enet", "G1", "G2", "G3", "I1"]
-    reales = {c: np.nanmedian(np.stack([r[c][:k] for r in reps]), 0) for c in claves}
-    umbrales = {}
-    for c in claves:
+    reales = {c: np.nanmedian(np.stack([r[c][:k] for r in reps]), 0) for c in CLAVES}
+    maximos = {}
+    for c in CLAVES:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", RuntimeWarning)
-            maxs = np.array([np.nanmax(r[c][k:]) if np.isfinite(r[c][k:]).any() else np.nan for r in reps])
-        umbrales[c] = float(np.nanpercentile(maxs, 95)) if np.isfinite(maxs).any() else np.nan
+            maximos[c] = np.array([np.nanmax(r[c][k:]) if np.isfinite(r[c][k:]).any() else np.nan for r in reps])
     signo_ridge = np.sign(np.nanmedian(np.stack([r["signo_ridge"][:k] for r in reps]), 0))
     signo_gbm = np.sign(np.nanmedian(np.stack([r["signo_gbm"][:k] for r in reps]), 0))
+    base_tabla = dict(variables=dis.variables, signos=signos, reales=reales, maximos=maximos,
+                      signo_ridge=signo_ridge, signo_gbm=signo_gbm)
+    tabla = tabla_etapa2(base_tabla, C.PERCENTIL)
+    curvas_sombra = np.stack([r["curvas_sombra"] for r in reps])  # (R, F, k, bins)
+    return dict(tabla=tabla, base=base, hp=hp, curvas_sombra=curvas_sombra, folds=fl, base_tabla=base_tabla)
 
-    tabla = pd.DataFrame({"variable": dis.variables, "signo_prereg": signos})
-    for c in claves:
+
+def tabla_etapa2(b: dict, percentil: float) -> pd.DataFrame:
+    """Tabla 6.4 con umbrales = percentil dado del máximo de las sombras (permite recalibrar sin reentrenar)."""
+    reales, signo_ridge, signo_gbm = b["reales"], b["signo_ridge"], b["signo_gbm"]
+    umbrales = {
+        c: float(np.nanpercentile(m, percentil)) if np.isfinite(m).any() else np.nan for c, m in b["maximos"].items()
+    }
+    tabla = pd.DataFrame({"variable": b["variables"], "signo_prereg": b["signos"]})
+    for c in CLAVES:
         tabla[c] = reales[c]
         tabla[f"umbral_{c}"] = umbrales[c]
     tabla["cumple_lineal"] = (tabla.L1_ridge > umbrales["L1_ridge"]) & (tabla.L1_enet > umbrales["L1_enet"])
@@ -193,9 +204,7 @@ def etapa2(per: Periodo, dis: Diseno, R: int = C.R2, semilla: int = C.SEMILLA + 
     tabla["cumple_G2"] = tabla[g_forma] > umbrales[g_forma]
     tabla["signo_ridge"] = signo_ridge
     tabla["signo_gbm"] = signo_gbm
-
-    curvas_sombra = np.stack([r["curvas_sombra"] for r in reps])  # (R, F, k, bins)
-    return dict(tabla=tabla, base=base, hp=hp, curvas_sombra=curvas_sombra, folds=fl)
+    return tabla
 
 
 def clasificar(salida_e1: pd.DataFrame, tabla_e2: pd.DataFrame | None, rep: dict[str, str], X: pd.DataFrame) -> pd.DataFrame:
