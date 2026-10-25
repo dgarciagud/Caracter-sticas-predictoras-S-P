@@ -28,6 +28,7 @@ warnings.filterwarnings("ignore")
 CELDAS = [("F01", "lineal", 0.02), ("F06", "lineal", 0.02), ("F01", "lineal", 0.04), ("F06", "umbral", 0.04)]
 # v4: ruido con la volatilidad de cada semana alineada (z desplazado × sigma_5 en t), efecto plantado en retornos
 # y objetivo = el de la versión activa. Se activa con --ruido-alineado; incluye una celda sin efecto.
+CELDAS_V5 = [("ninguna", "ninguna", 0.0), ("F01", "lineal", 0.005), ("F01", "lineal", 0.01), ("F01", "lineal", 0.02), ("F06", "lineal", 0.04), ("F06", "umbral", 0.04)]
 CELDAS_V4 = [("ninguna", "ninguna", 0.0), ("F01", "lineal", 0.02), ("F01", "lineal", 0.04), ("F06", "lineal", 0.04), ("F06", "umbral", 0.04)]
 
 
@@ -40,6 +41,7 @@ def main():
     ap.add_argument("--modo-u2", default=None)
     ap.add_argument("--criterio-gbm", default=None, help="p. ej. G1,G3")
     ap.add_argument("--ruido-alineado", action="store_true")
+    ap.add_argument("--celdas-v5", action="store_true")
     ap.add_argument("--n-jobs", type=int, default=4)
     ap.add_argument("--salida", default="potencia_completa")
     a = ap.parse_args()
@@ -59,7 +61,7 @@ def main():
     dest = C.RAIZ / "resultados" / a.salida
     dest.mkdir(parents=True, exist_ok=True)
     filas = []
-    celdas = CELDAS_V4 if a.ruido_alineado else CELDAS
+    celdas = CELDAS_V5 if a.celdas_v5 else CELDAS_V4 if a.ruido_alineado else CELDAS
     z = per.y if C.OBJETIVO == "y_norm" else per.y / per.sigma5  # retorno normalizado por su volatilidad
     for r, k in enumerate(ks):
         idx, ok = indices_sombra(T, int(k))
