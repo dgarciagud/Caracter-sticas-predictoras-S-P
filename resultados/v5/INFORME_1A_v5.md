@@ -87,7 +87,28 @@ ridge_ct dan los mismos pesos porque la regla ya trunca en 0).
 
 ## Nula del procedimiento y criterios 7.6
 
-__NULA_V5__
+**Nula del procedimiento** (100 corridas con y_norm desplazado, `06_nula_procedimiento.csv`): 3/100 corridas dan una
+variable estable (F01 dos veces, F14 una), lo esperado con la calibración (3 %).
+
+| Métrica | Real | p95 de la nula | Corridas nulas que igualan o superan el real |
+| --- | --- | --- | --- |
+| Nº de variables estables | 1 | 0 | 3/100 |
+| R² OOS validación (ridge) | 0,78 % | 0 | **0/100** (máximo nulo 0,53 %) |
+| Sharpe neto validación | 0,39 | 0,19 | 2/100 |
+
+**Criterios 7.6** (`08_criterios_holdout.json`):
+
+| Criterio | Resultado |
+| --- | --- |
+| R² OOS > 0 y Clark-West p < 0,10 | ✗ (R² +0,78 %, p = 0,14) |
+| DSR > 0,95 | ✗ (0,937) |
+| PBO < 0,5 | ✗ (0,67) |
+| Nº estables > p95 de la nula | ✓ (1 frente a 0) |
+| R² OOS > p95 de la nula | ✓ (0,78 % frente a 0) |
+
+**El holdout no se abre**: fallan tres de los cinco criterios. El procedimiento sí se distingue del ruido (ninguna de
+las 100 corridas nulas iguala el R² OOS real), pero la mejora no es lo bastante grande ni robusta frente a los 29
+ensayos acumulados.
 
 ## Conclusión de la línea 1A
 

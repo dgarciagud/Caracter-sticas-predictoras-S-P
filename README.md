@@ -20,7 +20,8 @@ Datos y librerías del repositorio de Stefan Jansen, *Machine Learning for Tradi
 [`resultados/v2_mediana/INFORME_1A_v2.md`](resultados/v2_mediana/INFORME_1A_v2.md) (v2, mediana de los folds,
 reapertura del pre-registro tras ver la v1) y
 [`resultados/v3/INFORME_1A_v3.md`](resultados/v3/INFORME_1A_v3.md) (v3, criterios elegidos por potencia) y
-[`resultados/v4/INFORME_1A_v4.md`](resultados/v4/INFORME_1A_v4.md) (v4, test 1997-2018 y objetivo normalizado; potencia 93 % a R² 2 %).
+[`resultados/v4/INFORME_1A_v4.md`](resultados/v4/INFORME_1A_v4.md) (v4, test 1997-2018 y objetivo normalizado; potencia 93 % a R² 2 %) y
+[`resultados/v5/INFORME_1A_v5.md`](resultados/v5/INFORME_1A_v5.md) (v5, umbrales calibrados al 5 % de error total; **F05 estable condicional**, holdout sin abrir).
 
 Prueba de potencia de la etapa 1 (datos sintéticos): [`resultados/potencia/INFORME_POTENCIA.md`](resultados/potencia/INFORME_POTENCIA.md).
 
