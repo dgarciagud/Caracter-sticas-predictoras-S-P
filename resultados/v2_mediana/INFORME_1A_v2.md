@@ -75,3 +75,28 @@ pendiente SHAP se queda a un 80 % del umbral y la forma no es monótona (el efec
   con la mediana y lineal por encima de sus sombras. Lo que falla es la forma: es un efecto de umbral, no lineal ni
   monótono. Si se quiere seguir, la siguiente reapertura natural es pre-registrar F06 en forma de umbral
   (p. ej. VRP por encima de su p70 de los 3 años previos). Sería la v3 y sumaría otro ensayo.
+
+## Diagnóstico del GBM para F06 (sin cambiar la configuración)
+
+`scripts/diagnostico_f06.py`, con 30 réplicas y los mismos offsets de la etapa 2. Resultados en
+`diagnostico_f06/`. No es una configuración nueva, así que no suma en `trials.jsonl`.
+
+| Fold | 1 | 2 | 3 | 4 | 5 |
+| --- | --- | --- | --- | --- | --- |
+| Semanas de entrenamiento | 196 | 279 | 363 | 446 | 529 |
+| Hojas por árbol, sin sombras (máx. 7) | 3,6 | 4,5 | 4,7 | 4,5 | 4,6 |
+| Cortes en F06, sin sombras | 383 | 516 | 612 | 531 | 511 |
+| Cortes en F06, con sombras | 199 | 254 | 317 | 307 | 311 |
+| Cortes en la sombra de F06 | 205 | 233 | 267 | 264 | 262 |
+| G1 sin / con sombras | 0,0059 / 0,0039 | 0,0042 / 0,0026 | 0,0018 / 0,0021 | 0,0076 / 0,0070 | 0,0029 / 0,0037 |
+| G2 sin / con sombras | 0,09 / 0,05 | 0,01 / −0,16 | −0,45 / −0,43 | −0,05 / −0,00 | −0,10 / 0,08 |
+| G3 sin / con sombras | 0,0066 / 0,0051 | 0,0036 / 0,0026 | 0,0034 / 0,0027 | 0,0031 / 0,0029 | 0,0023 / 0,0020 |
+
+1. **Hoja mínima (fold 1)**: limita poco. Los árboles del fold 1 usan 3,6 hojas frente a ~4,5 en los demás, y
+   F06 recibe igualmente la mitad de los cortes. No es lo que la deja fuera.
+2. **Competencia con las sombras**: es real. Las sombras se llevan la mitad de los cortes, la de F06 tanto como
+   la propia F06, y G1 y G3 bajan entre un 10 % y un 35 % en los folds 1-2. Aun así, sin sombras las medianas
+   (G1 0,0042, G3 0,0034) siguen por debajo de los umbrales actuales (0,0048 y 0,0046). Además, esos umbrales
+   cambiarían con modelos separados, así que no se puede afirmar que F06 pasaría.
+3. **La forma es el freno principal**: G2 (monotonía) está en torno a 0 con y sin sombras y en todos los folds.
+   Ni la hoja mínima ni las sombras lo explican: el efecto de F06 es de umbral, no monótono.
