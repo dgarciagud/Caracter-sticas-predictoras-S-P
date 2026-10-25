@@ -29,7 +29,7 @@ datos:
 muestra:
   inicio_datos: "1988-01-01"
   inicio_carga: "1988-01-01"
-  objetivo: "y"   # BORRADOR: y o y_norm según la regla de la cabecera
+  objetivo: "y_norm"   # elegido por la regla de la cabecera: +20 puntos de potencia en la etapa 1 (88 % frente a 68 %)
   descubrimiento: ["1993-01-01", "2018-12-31"]
   validacion: ["2019-01-01", "2022-12-31"]
   holdout: ["2023-01-01", "2025-12-31"]   # sellado: el código no construye y en este periodo

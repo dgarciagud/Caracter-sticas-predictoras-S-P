@@ -26,6 +26,9 @@ from potencia import senal  # noqa: E402
 
 warnings.filterwarnings("ignore")
 CELDAS = [("F01", "lineal", 0.02), ("F06", "lineal", 0.02), ("F01", "lineal", 0.04), ("F06", "umbral", 0.04)]
+# v4: ruido con la volatilidad de cada semana alineada (z desplazado × sigma_5 en t), efecto plantado en retornos
+# y objetivo = el de la versión activa. Se activa con --ruido-alineado; incluye una celda sin efecto.
+CELDAS_V4 = [("ninguna", "ninguna", 0.0), ("F01", "lineal", 0.02), ("F01", "lineal", 0.04), ("F06", "lineal", 0.04), ("F06", "umbral", 0.04)]
 
 
 def main():
@@ -36,6 +39,7 @@ def main():
     ap.add_argument("--agregacion", default=None)
     ap.add_argument("--modo-u2", default=None)
     ap.add_argument("--criterio-gbm", default=None, help="p. ej. G1,G3")
+    ap.add_argument("--ruido-alineado", action="store_true")
     ap.add_argument("--n-jobs", type=int, default=4)
     ap.add_argument("--salida", default="potencia_completa")
     a = ap.parse_args()
@@ -55,26 +59,35 @@ def main():
     dest = C.RAIZ / "resultados" / a.salida
     dest.mkdir(parents=True, exist_ok=True)
     filas = []
+    celdas = CELDAS_V4 if a.ruido_alineado else CELDAS
+    z = per.y if C.OBJETIVO == "y_norm" else per.y / per.sigma5  # retorno normalizado por su volatilidad
     for r, k in enumerate(ks):
         idx, ok = indices_sombra(T, int(k))
-        y0, m0 = per.y[idx], per.ym[idx] & ok
+        m0 = per.ym[idx] & ok
+        y0 = z[idx] * per.sigma5 if a.ruido_alineado else per.y[idx]
         sd = np.nanstd(np.where(m0 & en_test, y0, np.nan))
-        for var, forma, r2 in CELDAS:
-            j = per.nombres.index(var)
-            y = y0 + sd * np.sqrt(r2 / (1 - r2)) * C.SIGNOS[var] * senal(per.X[:, j], forma, en_test)
+        for var, forma, r2 in celdas:
+            y = y0.copy()
+            if r2 > 0:
+                j = per.nombres.index(var)
+                y = y0 + sd * np.sqrt(r2 / (1 - r2)) * C.SIGNOS[var] * senal(per.X[:, j], forma, en_test)
+            if a.ruido_alineado and C.OBJETIVO == "y_norm":
+                y = y / per.sigma5
             sel = seleccionar_catalogo(per.con_y(y, m0), R1=a.r1, R2=a.r2, semilla=C.SEMILLA + 9000 + r, n_jobs=a.n_jobs)
             cat = sel["catalogo"].set_index("variable")
             estables = cat[cat.clase.str.startswith("estable")].index.tolist()
+            plantada = var in cat.index
             fila = dict(
                 replica=r,
                 variable=var,
                 forma=forma,
                 r2=r2,
-                clase_e1=cat.loc[var, "clase_e1"],
-                clase=cat.loc[var, "clase"],
-                motivo=cat.loc[var, "motivo"],
+                clase_e1=cat.loc[var, "clase_e1"] if plantada else "",
+                clase=cat.loc[var, "clase"] if plantada else "",
+                motivo=cat.loc[var, "motivo"] if plantada else "",
                 detectada=var in estables,
                 otras_estables=";".join(v for v in estables if v != var),
+                n_otras_estables=len([v for v in estables if v != var]),
             )
             filas.append(fila)
             print(fila, flush=True)
@@ -83,6 +96,7 @@ def main():
     res = d.groupby(["variable", "forma", "r2"]).agg(
         potencia_etapa1=("clase_e1", lambda s: s.isin(["pasa_global", "condicional"]).mean()),
         potencia_completa=("detectada", "mean"),
+        alguna_otra_estable=("n_otras_estables", lambda v: (v > 0).mean()),
         n=("detectada", "size"),
     )
     res.to_csv(dest / "potencia_completa_resumen.csv")
