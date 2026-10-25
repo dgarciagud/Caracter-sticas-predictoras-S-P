@@ -20,6 +20,8 @@ Datos y librerías del repositorio de Stefan Jansen, *Machine Learning for Tradi
 [`resultados/v2_mediana/INFORME_1A_v2.md`](resultados/v2_mediana/INFORME_1A_v2.md) (v2, mediana de los folds,
 reapertura del pre-registro tras ver la v1).
 
+Prueba de potencia de la etapa 1 (datos sintéticos): [`resultados/potencia/INFORME_POTENCIA.md`](resultados/potencia/INFORME_POTENCIA.md).
+
 Para ejecutar una versión distinta de la v1: `export LINEA1A_PREREG=preregistro/preregistro_1A_v2_mediana.yaml`.
 Los resultados van a `resultados/<version>/` y `trials.jsonl` acumula los ensayos de todas las versiones.
 
