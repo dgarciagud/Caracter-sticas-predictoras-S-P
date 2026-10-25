@@ -1,5 +1,6 @@
 # Pre-registro de la línea 1A, versión 5 (cuarta y ÚLTIMA reapertura de la línea 1A)
-# BORRADOR hasta comprobar la potencia con el percentil calibrado.
+# CONGELADO el 2026-10-26 tras la prueba de potencia con p* = 50 (resultados/potencia_completa_v5, 30 réplicas):
+# falsos positivos 0/30; F01 lineal R2 0,5 % 70 %, 1 % 97 %, 2 % 100 %; F06 lineal 4 % 83 %; F06 umbral 4 % 90 %.
 # Único cambio frente a la v4: el percentil de la nula que fija todos los umbrales (etapas 1 y 2) se calibra para que
 # el error del procedimiento completo sea ~5 % (regla fijada antes de calibrar: el percentil más bajo de la rejilla
 # 95..50 con <= 5 % de conjuntos sin señal que den alguna variable estable). Calibración con 100 conjuntos sin señal

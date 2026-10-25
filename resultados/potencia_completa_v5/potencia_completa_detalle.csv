@@ -1,0 +1,181 @@
+replica,variable,forma,r2,clase_e1,clase,motivo,detectada,otras_estables,n_otras_estables
+0,ninguna,ninguna,0.0,,,,False,,0
+0,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+0,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+0,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+0,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+0,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+1,ninguna,ninguna,0.0,,,,False,,0
+1,F01,lineal,0.005,condicional,estable_condicional,cumple I1 y G2 en R_trend=1,True,,0
+1,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+1,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+1,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+1,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+2,ninguna,ninguna,0.0,,,,False,,0
+2,F01,lineal,0.005,descartada_e1,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),False,,0
+2,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+2,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+2,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+2,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+3,ninguna,ninguna,0.0,,,,False,,0
+3,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+3,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+3,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+3,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+3,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+4,ninguna,ninguna,0.0,,,,False,,0
+4,F01,lineal,0.005,descartada_e1,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),False,,0
+4,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+4,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+4,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+4,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+5,ninguna,ninguna,0.0,,,,False,,0
+5,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+5,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+5,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+5,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+5,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+6,ninguna,ninguna,0.0,,,,False,,0
+6,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+6,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+6,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+6,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+6,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+7,ninguna,ninguna,0.0,,,,False,,0
+7,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+7,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+7,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+7,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+7,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+8,ninguna,ninguna,0.0,,,,False,,0
+8,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+8,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+8,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+8,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+8,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+9,ninguna,ninguna,0.0,,,,False,,0
+9,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+9,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+9,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+9,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+9,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+10,ninguna,ninguna,0.0,,,,False,,0
+10,F01,lineal,0.005,condicional,estable_condicional,cumple I1 y G2 en R_trend=1,True,,0
+10,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+10,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+10,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+10,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+11,ninguna,ninguna,0.0,,,,False,,0
+11,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+11,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+11,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+11,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+11,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+12,ninguna,ninguna,0.0,,,,False,,0
+12,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+12,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+12,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+12,F06,lineal,0.04,pasa_global,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+12,F06,umbral,0.04,pasa_global,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+13,ninguna,ninguna,0.0,,,,False,,0
+13,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+13,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+13,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+13,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+13,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+14,ninguna,ninguna,0.0,,,,False,,0
+14,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+14,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+14,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+14,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+14,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+15,ninguna,ninguna,0.0,,,,False,,0
+15,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+15,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+15,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+15,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+15,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+16,ninguna,ninguna,0.0,,,,False,,0
+16,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+16,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+16,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+16,F06,lineal,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F02,False,,0
+16,F06,umbral,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+17,ninguna,ninguna,0.0,,,,False,,0
+17,F01,lineal,0.005,descartada_e1,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),False,,0
+17,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+17,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+17,F06,lineal,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+17,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+18,ninguna,ninguna,0.0,,,,False,,0
+18,F01,lineal,0.005,descartada_e1,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),False,,0
+18,F01,lineal,0.01,descartada_e1,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),False,,0
+18,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+18,F06,lineal,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+18,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+19,ninguna,ninguna,0.0,,,,False,,0
+19,F01,lineal,0.005,descartada_e1,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),False,,0
+19,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+19,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,F06,1
+19,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+19,F06,umbral,0.04,condicional,estable_condicional,cumple I1 y G2 en R_vol=0;R_trend=1,True,,0
+20,ninguna,ninguna,0.0,,,,False,,0
+20,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+20,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+20,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+20,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+20,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,F05,1
+21,ninguna,ninguna,0.0,,,,False,,0
+21,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+21,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+21,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+21,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+21,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+22,ninguna,ninguna,0.0,,,,False,,0
+22,F01,lineal,0.005,descartada_e1,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),False,,0
+22,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+22,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+22,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+22,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+23,ninguna,ninguna,0.0,,,,False,,0
+23,F01,lineal,0.005,condicional,redundante,no cumple en etapa 2; comparte efecto con F06,False,,0
+23,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+23,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+23,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+23,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+24,ninguna,ninguna,0.0,,,,False,,0
+24,F01,lineal,0.005,condicional,estable_condicional,cumple I1 y G2 en R_trend=1,True,,0
+24,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+24,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+24,F06,lineal,0.04,pasa_global,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+24,F06,umbral,0.04,pasa_global,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+25,ninguna,ninguna,0.0,,,,False,,0
+25,F01,lineal,0.005,condicional,redundante,no cumple en etapa 2; comparte efecto con F06,False,,0
+25,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+25,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+25,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+25,F06,umbral,0.04,condicional,estable_condicional,cumple I1 y G2 en R_vol=0;R_trend=1,True,,0
+26,ninguna,ninguna,0.0,,,,False,,0
+26,F01,lineal,0.005,descartada_e1,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),False,,0
+26,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+26,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+26,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+26,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+27,ninguna,ninguna,0.0,,,,False,,0
+27,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+27,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+27,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+27,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+27,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+28,ninguna,ninguna,0.0,,,,False,,0
+28,F01,lineal,0.005,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+28,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+28,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+28,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+28,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+29,ninguna,ninguna,0.0,,,,False,,0
+29,F01,lineal,0.005,condicional,estable_condicional,cumple I1 y G2 en R_vol=0,True,,0
+29,F01,lineal,0.01,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+29,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+29,F06,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+29,F06,umbral,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
