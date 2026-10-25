@@ -1,0 +1,11 @@
+variable,clase_e1,estados,representada_por,clase,motivo,cluster,estado_condicional
+F01,descartada_e1,,,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),2,
+F02,descartada_e1,,,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),2,
+F03,excepcion,,F03,descartada,etapa 2: L1_ridge=0.0256<= 0.0404; L1_enet=0.0134<= 0.0318; G1=0.0527<= 0.084; G3=0.0978<= 0.111,1,
+F04,descartada_e1,,,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),1,
+F05,descartada_e1,,,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),2,
+F06,excepcion,,F06,descartada,etapa 2: L1_ridge=0.00528<= 0.0404; L1_enet=0.000623<= 0.0318; G1=0.0141<= 0.084; G3=0.0612<= 0.111,3,
+F07,descartada_e1,,,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),4,
+F11,descartada_e1,,,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),6,
+F13,excepcion,,F13,descartada,etapa 2: G1=0.052<= 0.084; G3=0.0427<= 0.111,7,
+F14,descartada_e1,,,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),5,
