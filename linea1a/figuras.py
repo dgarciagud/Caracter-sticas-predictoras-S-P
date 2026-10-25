@@ -37,7 +37,7 @@ def dependencia(e2: dict, tabla: pd.DataFrame, ruta) -> None:
         ax.axhline(0, color="0.5", lw=0.6)
         ax.set_xlim(-3, 3)
         ax.set_xlabel("x estandarizada (media y desviación del entrenamiento)")
-        ax.set_ylabel("SHAP (retorno log 5d)")
+        ax.set_ylabel("SHAP (retorno log 5d / σ̂₅)" if C.OBJETIVO == "y_norm" else "SHAP (retorno log 5d)")
         if j == 0:
             ax.legend(fontsize=7, ncol=3)
     fig.tight_layout()
