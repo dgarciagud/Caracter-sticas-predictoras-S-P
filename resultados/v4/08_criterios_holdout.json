@@ -1,0 +1,21 @@
+{
+  "real": {
+    "n_estables": 0,
+    "r2_oos": 0.0,
+    "sharpe_neto": 0.18641365823883924
+  },
+  "p95_nula": {
+    "n_estables": 0.0,
+    "r2_oos": 0.0,
+    "sharpe_neto": 0.18641365823883924
+  },
+  "n_nula": 100,
+  "criterios": {
+    "R2_OOS>0 y CW p<0.10 (ridge)": false,
+    "DSR>0.95": false,
+    "PBO<0.5": false,
+    "n_estables > p95 nula": false,
+    "R2_OOS > p95 nula": false
+  },
+  "abrir_holdout": false
+}

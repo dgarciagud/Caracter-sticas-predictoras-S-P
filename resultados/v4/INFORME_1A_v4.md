@@ -70,7 +70,9 @@ F13 (semana FOMC) cumple en los dos lineales pero no en el GBM.
 
 ## Nula del procedimiento y criterios 7.6
 
-__NULA_V4__
+- Nula del procedimiento (100 corridas con y_norm desplazado): 0 variables estables en todas; falsos positivos
+  0/100 (IC 95 % 0-3,6 %), coherente con el 0/30 de la prueba de potencia.
+- Criterios 7.6: fallan los cinco (`08_criterios_holdout.json`). **El holdout sigue sellado.**
 
 ## Qué significa este nulo (el más informativo de las cuatro versiones)
 
