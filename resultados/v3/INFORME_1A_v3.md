@@ -66,7 +66,9 @@ final si la validación la confirmase.
 
 ## Nula del procedimiento y criterios 7.6
 
-__NULA_V3__
+- Nula del procedimiento (100 corridas con y desplazado): 0 variables estables en todas; falsos positivos 0/100
+  (IC 95 % 0-3,6 %). El procedimiento v3 sigue siendo estricto con el ruido aun siendo más potente.
+- Criterios 7.6: fallan los cinco (`08_criterios_holdout.json`). **El holdout sigue sellado.**
 
 ## Lectura conjunta de v1, v2 y v3
 
