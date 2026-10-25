@@ -35,6 +35,7 @@ def main():
     ap.add_argument("--r2", type=int, default=20)
     ap.add_argument("--agregacion", default=None)
     ap.add_argument("--modo-u2", default=None)
+    ap.add_argument("--criterio-gbm", default=None, help="p. ej. G1,G3")
     ap.add_argument("--n-jobs", type=int, default=4)
     ap.add_argument("--salida", default="potencia_completa")
     a = ap.parse_args()
@@ -42,6 +43,8 @@ def main():
         C.AGREGACION = a.agregacion
     if a.modo_u2:
         C.MODO_U2 = a.modo_u2
+    if a.criterio_gbm:
+        C.CRITERIO_GBM = a.criterio_gbm.split(",")
 
     per = Periodo.desde_panel(pd.read_parquet(C.CACHE / "panel.parquet"))
     T = len(per.fechas)

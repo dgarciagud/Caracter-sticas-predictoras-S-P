@@ -186,9 +186,11 @@ def etapa2(per: Periodo, dis: Diseno, R: int = C.R2, semilla: int = C.SEMILLA + 
         tabla[c] = reales[c]
         tabla[f"umbral_{c}"] = umbrales[c]
     tabla["cumple_lineal"] = (tabla.L1_ridge > umbrales["L1_ridge"]) & (tabla.L1_enet > umbrales["L1_enet"])
-    tabla["cumple_gbm"] = (tabla.G1 > umbrales["G1"]) & (tabla.G2 > umbrales["G2"]) & (tabla.G3 > umbrales["G3"])
+    tabla["cumple_gbm"] = np.logical_and.reduce([tabla[g] > umbrales[g] for g in C.CRITERIO_GBM])
     tabla["cumple_I1"] = tabla.I1 > umbrales["I1"] if np.isfinite(umbrales["I1"]) else False
-    tabla["cumple_G2"] = tabla.G2 > umbrales["G2"]
+    # Forma dentro del régimen para las condicionales: G2 si forma parte del criterio GBM, si no G1.
+    g_forma = "G2" if "G2" in C.CRITERIO_GBM else "G1"
+    tabla["cumple_G2"] = tabla[g_forma] > umbrales[g_forma]
     tabla["signo_ridge"] = signo_ridge
     tabla["signo_gbm"] = signo_gbm
 
@@ -227,7 +229,7 @@ def clasificar(salida_e1: pd.DataFrame, tabla_e2: pd.DataFrame | None, rep: dict
             else:
                 fallos = [
                     f"{s}={t[s]:.3g}<= {t['umbral_' + s]:.3g}"
-                    for s in ["L1_ridge", "L1_enet", "G1", "G2", "G3"]
+                    for s in ["L1_ridge", "L1_enet", *C.CRITERIO_GBM]
                     if not (t[s] > t["umbral_" + s])
                 ]
                 clase, motivo = "descartada", "etapa 2: " + "; ".join(fallos)

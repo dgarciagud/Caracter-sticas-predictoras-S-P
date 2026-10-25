@@ -53,6 +53,8 @@ FIGURAS = RESULTADOS / "figuras"
 AGREGACION = PREREG.get("agregacion_folds", "min")
 # U2 de la etapa 1: "por_fold" (v1, v2), "agregado" (quintiles con todas las semanas de test) o "ninguno".
 MODO_U2 = PREREG.get("modo_U2", "por_fold")
+# Estadísticos que debe superar el GBM en la etapa 2 (v1, v2: G1, G2 y G3).
+CRITERIO_GBM: list[str] = list(PREREG.get("criterio_gbm", ["G1", "G2", "G3"]))
 
 
 def agregar_folds(a, axis: int = -1):
