@@ -64,7 +64,7 @@ pendiente SHAP se queda a un 80 % del umbral y la forma no es monótona (el efec
 ## Validación, nula y criterios
 
 - Validación 2019-2022: catálogo vacío → media histórica (Sharpe neto 0,16, R² OOS = 0). DSR y PBO no aplican.
-- Nula del procedimiento con la mediana: __NULA_V2__
+- Nula del procedimiento con la mediana: 100 corridas, 0 variables estables en todas (falsos positivos 0/100, IC 95 % 0-3,6 %). Igual que la v1.
 - Criterios 7.6: fallan todos. **El holdout sigue sellado.**
 
 ## Qué aprendemos de la v2
