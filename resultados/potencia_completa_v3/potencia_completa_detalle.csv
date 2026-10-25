@@ -1,0 +1,3 @@
+replica,variable,forma,r2,clase_e1,clase,motivo,detectada,otras_estables
+0,F01,lineal,0.02,descartada_e1,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),False,
+0,F06,lineal,0.02,excepcion,supresion_sospechosa,excepción que cumple en etapa 2,False,
