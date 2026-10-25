@@ -1,6 +1,7 @@
 # Pre-registro de la línea 1A, versión 4 (tercera reapertura; v1 2026-10-24, v2 y v3 2026-10-25)
-# BORRADOR: se congela solo si la prueba de potencia del procedimiento completo alcanza el objetivo fijado
-# antes de medirla: potencia >= 70 % para F01 lineal con R2 2 % y falsos positivos <= 5 %.
+# CONGELADO el 2026-10-26 tras cumplir el objetivo fijado antes de medirlo (potencia >= 70 % para F01 lineal
+# con R2 2 % y falsos positivos <= 5 %): potencia completa 93 % (28/30), falsos positivos 0/30 en la celda sin
+# efecto (resultados/potencia_completa_v4). Limitación conocida: F06 lineal al 4 % se detecta 0/30 y F06 umbral 9/30.
 # Cambios frente a v3:
 #   1. Más muestra de test: datos desde 1988 (índice de Jansen desde 1980, VIX desde 1990), descubrimiento
 #      1993-2018 y 5 bloques de test en 1997-2018 (~1.150 semanas frente a ~410).

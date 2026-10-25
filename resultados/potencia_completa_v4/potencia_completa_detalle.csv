@@ -68,3 +68,84 @@ replica,variable,forma,r2,clase_e1,clase,motivo,detectada,otras_estables,n_otras
 13,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
 13,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
 13,F06,lineal,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+13,F06,umbral,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+14,ninguna,ninguna,0.0,,,,False,,0
+14,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+14,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+14,F06,lineal,0.04,pasa_global,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+14,F06,umbral,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+15,ninguna,ninguna,0.0,,,,False,,0
+15,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+15,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+15,F06,lineal,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+15,F06,umbral,0.04,condicional,estable_condicional,cumple I1 y G2 en R_vol=0;R_trend=1,True,,0
+16,ninguna,ninguna,0.0,,,,False,,0
+16,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+16,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+16,F06,lineal,0.04,excepcion,descartada,etapa 2: G1=0.055<= 0.0956; G3=0.0879<= 0.12,False,,0
+16,F06,umbral,0.04,excepcion,descartada,etapa 2: L1_ridge=0.0083<= 0.0121; L1_enet=0<= 0.0128; G1=0.0664<= 0.118,False,,0
+17,ninguna,ninguna,0.0,,,,False,,0
+17,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+17,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+17,F06,lineal,0.04,excepcion,supresion_sospechosa,excepción que cumple en etapa 2,False,,0
+17,F06,umbral,0.04,excepcion,supresion_sospechosa,excepción que cumple en etapa 2,False,,0
+18,ninguna,ninguna,0.0,,,,False,,0
+18,F01,lineal,0.02,descartada_e1,descartada,no pasa la etapa 1 (U1/U2 frente a q1/q2),False,,0
+18,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+18,F06,lineal,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+18,F06,umbral,0.04,excepcion,descartada,etapa 2: L1_ridge=0.0359<= 0.0406; L1_enet=0.029<= 0.039; G1=0.0554<= 0.08,False,,0
+19,ninguna,ninguna,0.0,,,,False,,0
+19,F01,lineal,0.02,condicional,estable_condicional,cumple I1 y G2 en R_trend=1,True,,0
+19,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+19,F06,lineal,0.04,excepcion,descartada,etapa 2: G1=0.126<= 0.14,False,,0
+19,F06,umbral,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+20,ninguna,ninguna,0.0,,,,False,,0
+20,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+20,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+20,F06,lineal,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+20,F06,umbral,0.04,condicional,estable_condicional,cumple I1 y G2 en R_vol=0,True,,0
+21,ninguna,ninguna,0.0,,,,False,,0
+21,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+21,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+21,F06,lineal,0.04,excepcion,supresion_sospechosa,excepción que cumple en etapa 2,False,,0
+21,F06,umbral,0.04,condicional,estable_condicional,cumple I1 y G2 en R_vol=0;R_trend=1,True,,0
+22,ninguna,ninguna,0.0,,,,False,,0
+22,F01,lineal,0.02,condicional,estable_condicional,cumple I1 y G2 en R_vol=0;R_trend=1,True,,0
+22,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+22,F06,lineal,0.04,excepcion,descartada,etapa 2: G1=0.117<= 0.159,False,,0
+22,F06,umbral,0.04,excepcion,descartada,etapa 2: G1=0.127<= 0.165,False,,0
+23,ninguna,ninguna,0.0,,,,False,,0
+23,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+23,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+23,F06,lineal,0.04,excepcion,supresion_sospechosa,excepción que cumple en etapa 2,False,,0
+23,F06,umbral,0.04,condicional,estable_condicional,cumple I1 y G2 en R_trend=1,True,,0
+24,ninguna,ninguna,0.0,,,,False,,0
+24,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+24,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+24,F06,lineal,0.04,excepcion,descartada,etapa 2: L1_ridge=0.0252<= 0.0266; L1_enet=0.00383<= 0.0347; G1=0.0351<= 0.117; G3=0.0787<= 0.133,False,,0
+24,F06,umbral,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+25,ninguna,ninguna,0.0,,,,False,,0
+25,F01,lineal,0.02,pasa_global,redundante,no cumple en etapa 2; comparte efecto con F06,False,,0
+25,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+25,F06,lineal,0.04,excepcion,descartada,etapa 2: L1_ridge=0.0317<= 0.0509; L1_enet=0.0404<= 0.0938; G1=0.0766<= 0.184; G3=0.115<= 0.145,False,,0
+25,F06,umbral,0.04,excepcion,descartada,etapa 2: L1_ridge=0.0202<= 0.0289; L1_enet=0.04<= 0.121; G1=0.0925<= 0.176,False,,0
+26,ninguna,ninguna,0.0,,,,False,,0
+26,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+26,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+26,F06,lineal,0.04,pasa_global,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+26,F06,umbral,0.04,pasa_global,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+27,ninguna,ninguna,0.0,,,,False,,0
+27,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+27,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+27,F06,lineal,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+27,F06,umbral,0.04,pasa_global,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+28,ninguna,ninguna,0.0,,,,False,,0
+28,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+28,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+28,F06,lineal,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+28,F06,umbral,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
+29,ninguna,ninguna,0.0,,,,False,,0
+29,F01,lineal,0.02,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+29,F01,lineal,0.04,pasa_global,estable_incondicional,cumple L1 y G1-G3,True,,0
+29,F06,lineal,0.04,excepcion,descartada,etapa 2: L1_ridge=0.0561<= 0.077; L1_enet=0.0438<= 0.0809; G1=0.0867<= 0.15; G3=0.105<= 0.13,False,,0
+29,F06,umbral,0.04,condicional,redundante,no cumple en etapa 2; comparte efecto con F03,False,,0
