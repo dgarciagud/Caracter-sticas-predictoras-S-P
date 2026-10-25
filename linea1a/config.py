@@ -49,12 +49,15 @@ VERSION = str(PREREG.get("version", "v1"))
 RESULTADOS = RAIZ / "resultados" if VERSION == "v1" else RAIZ / "resultados" / VERSION
 FIGURAS = RESULTADOS / "figuras"
 
-# Cómo se resume un estadístico sobre los folds: "min" (peor fold, v1) o "mediana".
+# Cómo se resume un estadístico sobre los folds: "min" (peor fold, v1), "mediana" (v2) o "media".
 AGREGACION = PREREG.get("agregacion_folds", "min")
+# U2 de la etapa 1: "por_fold" (v1, v2), "agregado" (quintiles con todas las semanas de test) o "ninguno".
+MODO_U2 = PREREG.get("modo_U2", "por_fold")
 
 
 def agregar_folds(a, axis: int = -1):
-    return np.nanmin(a, axis) if AGREGACION == "min" else np.nanmedian(a, axis)
+    f = {"min": np.nanmin, "mediana": np.nanmedian, "media": np.nanmean}[AGREGACION]
+    return f(a, axis)
 
 
 CANDIDATAS: list[str] = list(PREREG["candidatas"])

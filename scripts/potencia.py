@@ -10,7 +10,7 @@ plantada (pasa global: U1 > q1 y U2 > q2) con el peor fold (v1) y con la mediana
 pasan (falsos positivos). La etapa 1 es condición necesaria para "estable incondicional", así que esta potencia
 es una cota superior de la del procedimiento completo.
 
-Uso: python scripts/potencia.py [--runs 100] [--r1 200] [--n-jobs 4]
+Uso: python scripts/potencia.py [--runs 100] [--r1 200] [--n-jobs 4] [--variantes a,b] [--salida carpeta]
 """
 
 from __future__ import annotations
@@ -33,7 +33,15 @@ warnings.filterwarnings("ignore")
 VARIABLES = ["F06", "F01"]
 FORMAS = ["lineal", "umbral"]
 R2S = [0.0, 0.005, 0.01, 0.02, 0.04, 0.08]
-AGREGACIONES = {"v1_peor_fold": "min", "v2_mediana": "mediana"}
+# (agregación de U1 sobre folds, modo de U2)
+VARIANTES = {
+    "v1_peor_fold": ("min", "por_fold"),
+    "v2_mediana": ("mediana", "por_fold"),
+    "mediana_U2agregado": ("mediana", "agregado"),
+    "mediana_sinU2": ("mediana", "ninguno"),
+    "media_U2agregado": ("media", "agregado"),
+    "media_sinU2": ("media", "ninguno"),
+}
 
 
 def senal(x: np.ndarray, forma: str, en_test: np.ndarray) -> np.ndarray:
@@ -46,7 +54,7 @@ def senal(x: np.ndarray, forma: str, en_test: np.ndarray) -> np.ndarray:
     return np.nan_to_num(g)
 
 
-def una_replica(r: int, k: int, r1: int) -> list[dict]:
+def una_replica(r: int, k: int, r1: int, variantes: list[str]) -> list[dict]:
     per = Periodo.desde_panel(pd.read_parquet(C.CACHE / "panel.parquet"))
     T = len(per.fechas)
     idx, ok = indices_sombra(T, int(k))
@@ -66,8 +74,8 @@ def una_replica(r: int, k: int, r1: int) -> list[dict]:
             beta = sd * np.sqrt(r2 / (1 - r2)) * C.SIGNOS[var]
             y = y0 + beta * senal(per.X[:, j], forma, en_test)
         p = per.con_y(y, m0)
-        for version, agg in AGREGACIONES.items():
-            C.AGREGACION = agg
+        for version in variantes:
+            C.AGREGACION, C.MODO_U2 = VARIANTES[version]
             e1 = etapa1(p, R=r1, semilla=C.SEMILLA + 5000 + r)
             t = e1["tabla"]
             g = t[t.corte == "global"].set_index("variable")
@@ -91,12 +99,15 @@ def main():
     ap.add_argument("--runs", type=int, default=100)
     ap.add_argument("--r1", type=int, default=200)
     ap.add_argument("--n-jobs", type=int, default=4)
+    ap.add_argument("--variantes", default="v1_peor_fold,v2_mediana")
+    ap.add_argument("--salida", default="potencia")
     a = ap.parse_args()
+    variantes = a.variantes.split(",")
     per = Periodo.desde_panel(pd.read_parquet(C.CACHE / "panel.parquet"))
     ks = offsets(len(per.fechas), a.runs, C.SEMILLA + 7777)
-    res = Parallel(n_jobs=a.n_jobs, verbose=5)(delayed(una_replica)(r, k, a.r1) for r, k in enumerate(ks))
+    res = Parallel(n_jobs=a.n_jobs, verbose=5)(delayed(una_replica)(r, k, a.r1, variantes) for r, k in enumerate(ks))
     d = pd.DataFrame([f for filas in res for f in filas])
-    dest = C.RAIZ / "resultados" / "potencia"
+    dest = C.RAIZ / "resultados" / a.salida
     dest.mkdir(parents=True, exist_ok=True)
     d.to_csv(dest / "potencia_detalle.csv", index=False)
 

@@ -10,7 +10,7 @@ from scipy.cluster.hierarchy import fcluster, linkage
 from scipy.spatial.distance import squareform
 
 from . import config as C
-from .estadistica import monotonia_quintiles, nw_lags, pendiente_stambaugh, pendiente_t
+from .estadistica import monotonia_quintiles, nw_lags, pendiente_stambaugh, pendiente_t, spearman_enmascarado
 
 DUMMIES = {"F13", "F14"}
 
@@ -111,7 +111,7 @@ def _stats_celdas(per: Periodo, fl, X_src: np.ndarray, idx: np.ndarray, okm: np.
     signo_ok = np.full((R, len(C.CORTES), p, len(fl)), np.nan)
     for ci, corte in enumerate(C.CORTES):
         mc = mascara_corte(per, corte)
-        t_f, r_f = [], []
+        t_f, r_f, todas = [], [], []
         for fi, (_, test) in enumerate(fl):
             filas = test[mc[test] & per.ym[test]]
             n = len(filas)
@@ -119,6 +119,7 @@ def _stats_celdas(per: Periodo, fl, X_src: np.ndarray, idx: np.ndarray, okm: np.
                 t_f.append(np.full((R, p), np.nan))
                 r_f.append(np.full((R, p), np.nan))
                 continue
+            todas.append(filas)
             src = idx[:, filas]  # (R, n)
             x = np.transpose(X_src[src], (0, 2, 1))  # (R, p, n)
             m = np.isfinite(x) & okm[:, None, filas]
@@ -135,7 +136,16 @@ def _stats_celdas(per: Periodo, fl, X_src: np.ndarray, idx: np.ndarray, okm: np.
         sr = np.where(con[None, :, None], signos[None, :, None] * r_f, np.abs(r_f))
         with np.errstate(all="ignore"):
             U1[:, ci, :] = C.agregar_folds(st, -1)
-            U2[:, ci, :] = C.agregar_folds(sr, -1)
+            if C.MODO_U2 == "por_fold":
+                U2[:, ci, :] = C.agregar_folds(sr, -1)
+        if C.MODO_U2 == "agregado" and todas:
+            # Monotonía con todas las semanas de test evaluadas juntas (~400 en el corte global): correlación
+            # de rangos x-y. Las medias por quintil agregadas saturan (el máximo del ruido llega a 1).
+            filas = np.concatenate(todas)
+            x = np.transpose(X_src[idx[:, filas]], (0, 2, 1))
+            m = np.isfinite(x) & okm[:, None, filas]
+            rho = spearman_enmascarado(x, per.y[filas], m)
+            U2[:, ci, :] = np.where(con[None, :], signos[None, :] * rho, np.abs(rho))
     return U1, U2, signo_ok
 
 
@@ -164,13 +174,15 @@ def etapa1(per: Periodo, R: int = C.R1, semilla: int = C.SEMILLA, lote: int = 10
         with np.errstate(all="ignore"):
             M1[a : a + lote] = np.nanmax(u1.reshape(len(kk), -1), -1)
             M2[a : a + lote] = np.nanmax(u2.reshape(len(kk), -1), -1)
-    q1, q2 = float(np.nanpercentile(M1, 95)), float(np.nanpercentile(M2, 95))
+    q1 = float(np.nanpercentile(M1, 95))
+    q2 = float(np.nanpercentile(M2, 95)) if np.isfinite(M2).any() else np.nan
 
     filas = []
     for ci, corte in enumerate(C.CORTES):
         for j, v in enumerate(per.nombres):
             u1, u2 = U1[ci, j], U2[ci, j]
-            pasa = bool(np.isfinite(u1) and u1 > q1 and (es_dummy[j] or (np.isfinite(u2) and u2 > q2)))
+            forma_ok = es_dummy[j] or C.MODO_U2 == "ninguno" or (np.isfinite(u2) and u2 > q2)
+            pasa = bool(np.isfinite(u1) and u1 > q1 and forma_ok)
             with np.errstate(all="ignore"):
                 p_perm = float((np.sum(U1s_all[:, ci, j] >= u1) + 1) / (np.sum(np.isfinite(U1s_all[:, ci, j])) + 1))
             filas.append(

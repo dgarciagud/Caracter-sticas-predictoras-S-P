@@ -58,6 +58,19 @@ def monotonia_quintiles(x: np.ndarray, y: np.ndarray, m: np.ndarray) -> np.ndarr
     return np.where(np.isfinite(medias).all(-1), rho, np.nan)
 
 
+def spearman_enmascarado(x: np.ndarray, y: np.ndarray, m: np.ndarray) -> np.ndarray:
+    """Correlación de rangos x-y vectorizada sobre los ejes iniciales; solo filas con m=True."""
+    yy = np.broadcast_to(y, x.shape)
+    rx = np.argsort(np.argsort(np.where(m, x, np.inf), axis=-1, kind="stable"), axis=-1).astype(float)
+    ry = np.argsort(np.argsort(np.where(m, yy, np.inf), axis=-1, kind="stable"), axis=-1).astype(float)
+    w = m.astype(float)
+    nv = w.sum(-1, keepdims=True)
+    rx = np.where(m, rx - (w * rx).sum(-1, keepdims=True) / nv, 0.0)
+    ry = np.where(m, ry - (w * ry).sum(-1, keepdims=True) / nv, 0.0)
+    with np.errstate(invalid="ignore", divide="ignore"):
+        return (rx * ry).sum(-1) / np.sqrt((rx * rx).sum(-1) * (ry * ry).sum(-1))
+
+
 def media_nw(z: np.ndarray, lags: int | None = None) -> tuple[float, float]:
     """Media de z con error estándar Newey-West; devuelve (media, t)."""
     z = np.asarray(z, float)
