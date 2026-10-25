@@ -58,15 +58,20 @@ def predecir(panel: pd.DataFrame, inc: list[str], cond: dict[str, str], ini=C.VA
             Xtr, Xte = _diseno(tr, inc, cond, lineal), _diseno(te, inc, cond, lineal)
             mu, sd = Xtr.mean(), Xtr.std().replace(0, 1)
             Ztr, Zte = (Xtr - mu) / sd, (Xte - mu) / sd
+            obj = tr[C.OBJETIVO]
             if lineal:
-                a = RidgeCV(alphas=ALPHAS_RIDGE, cv=TimeSeriesSplit(5)).fit(Ztr, tr.y).alpha_
-                m = Ridge(alpha=a).fit(Ztr, tr.y)
+                a = RidgeCV(alphas=ALPHAS_RIDGE, cv=TimeSeriesSplit(5)).fit(Ztr, obj).alpha_
+                m = Ridge(alpha=a).fit(Ztr, obj)
             else:
-                m = lgb.LGBMRegressor(**C.LGBM_PARAMS, random_state=C.SEMILLA).fit(Ztr, tr.y)
+                m = lgb.LGBMRegressor(**C.LGBM_PARAMS, random_state=C.SEMILLA).fit(Ztr, obj)
             ok = Zte.notna().all(1)
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore")
-                out.loc[te.index[ok], nombre] = m.predict(Zte[ok])
+                pred = m.predict(Zte[ok])
+            # Con el objetivo normalizado, la predicción de retorno es yhat_norm * sigma_5 (conocida en t).
+            if C.OBJETIVO == "y_norm":
+                pred = pred * te.sigma5[ok].to_numpy()
+            out.loc[te.index[ok], nombre] = pred
     for nombre in ("ridge", "gbm"):
         out[nombre + "_ct"] = out[nombre].clip(lower=0)
     out["ret_simple"] = test_all.ret_simple

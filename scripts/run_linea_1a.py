@@ -30,7 +30,7 @@ from linea1a.etapa1 import Periodo, indices_sombra, offsets, t_por_fold  # noqa:
 from linea1a.seleccion import n_estables, seleccionar_catalogo, variables_modelo  # noqa: E402
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
-PANEL = C.CACHE / "panel.parquet"
+PANEL = C.PANEL_PATH
 SEL = C.CACHE / ("seleccion_real.joblib" if C.VERSION == "v1" else f"seleccion_real_{C.VERSION}.joblib")
 R = C.RESULTADOS
 

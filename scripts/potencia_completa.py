@@ -46,7 +46,7 @@ def main():
     if a.criterio_gbm:
         C.CRITERIO_GBM = a.criterio_gbm.split(",")
 
-    per = Periodo.desde_panel(pd.read_parquet(C.CACHE / "panel.parquet"))
+    per = Periodo.desde_panel(pd.read_parquet(C.PANEL_PATH))
     T = len(per.fechas)
     en_test = np.zeros(T, bool)
     for _, te in folds(per):

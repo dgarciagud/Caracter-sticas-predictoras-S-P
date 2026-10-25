@@ -26,12 +26,13 @@ class Periodo:
     reg: pd.DataFrame  # R_vol, R_trend
     fin_etiqueta: pd.Series
     nombres: list[str]
+    sigma5: np.ndarray | None = None  # volatilidad prevista a 5 días en t (para el objetivo normalizado)
 
     @classmethod
     def desde_panel(cls, panel: pd.DataFrame, ini=C.DESC_INI, fin=C.DESC_FIN) -> "Periodo":
         p = panel.loc[ini:fin]
         p = p[p["fin_etiqueta"] <= fin]  # purga en la frontera con el periodo siguiente
-        y = p["y"].to_numpy(float)
+        y = p[C.OBJETIVO].to_numpy(float)
         return cls(
             fechas=p.index,
             X=p[C.CANDIDATAS].to_numpy(float),
@@ -40,14 +41,15 @@ class Periodo:
             reg=p[["R_vol", "R_trend"]],
             fin_etiqueta=p["fin_etiqueta"],
             nombres=list(C.CANDIDATAS),
+            sigma5=p["sigma5"].to_numpy(float),
         )
 
     def con_y(self, y: np.ndarray, ym: np.ndarray) -> "Periodo":
-        return Periodo(self.fechas, self.X, y, ym, self.reg, self.fin_etiqueta, self.nombres)
+        return Periodo(self.fechas, self.X, y, ym, self.reg, self.fin_etiqueta, self.nombres, self.sigma5)
 
 
 def folds(per: Periodo) -> list[tuple[np.ndarray, np.ndarray]]:
-    """Walk-forward expansivo: 5 bloques de test de igual duración en 2011-2018, con purga."""
+    """Walk-forward expansivo: 5 bloques de test de igual duración en la ventana de test, con purga."""
     bordes = pd.date_range(C.TEST_INI, C.TEST_FIN + pd.Timedelta(days=1), periods=C.N_FOLDS + 1)
     out = []
     for a, b in zip(bordes[:-1], bordes[1:]):

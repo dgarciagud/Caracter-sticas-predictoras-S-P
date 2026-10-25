@@ -79,7 +79,7 @@ def cargar_diario(fin: pd.Timestamp = C.VAL_FIN) -> pd.DataFrame:
     C.usar_repo_ml4t()
     from data import load_etfs, load_sp500_index
 
-    ini = "2003-01-01"
+    ini = C.INICIO_CARGA
     idx = load_sp500_index().filter(pl.col("timestamp") >= pl.lit(ini).str.to_date())
     idx = idx.filter(pl.col("timestamp") <= fin.date())
     d = idx.select(pl.col("timestamp").alias("date"), "close").sort("date")
@@ -169,6 +169,7 @@ def construir_panel(diario: pd.DataFrame) -> pd.DataFrame:
     f["ret_simple"] = p.shift(-C.H) / p - 1
     f["rf"] = d["DFF"] / 100 / 52
     f["sigma5"] = sigma5
+    f["y_norm"] = f["y"] / sigma5
     f["fin_etiqueta"] = fin_etiqueta
 
     # Decisión: último día hábil de cada semana ISO.

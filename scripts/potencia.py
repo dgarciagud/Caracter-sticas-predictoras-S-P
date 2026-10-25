@@ -54,43 +54,55 @@ def senal(x: np.ndarray, forma: str, en_test: np.ndarray) -> np.ndarray:
     return np.nan_to_num(g)
 
 
-def una_replica(r: int, k: int, r1: int, variantes: list[str]) -> list[dict]:
-    per = Periodo.desde_panel(pd.read_parquet(C.CACHE / "panel.parquet"))
+def una_replica(
+    r: int, k: int, r1: int, variantes: list[str], celdas_vf=None, r2s=R2S, objetivos: list[str] | None = None
+) -> list[dict]:
+    """Una réplica. Con `objetivos`, el ruido base conserva la volatilidad de cada semana (z desplazado × sigma_5
+    en t), el efecto se planta en retornos y la etapa 1 se evalúa con cada objetivo (y o y / sigma_5)."""
+    per = Periodo.desde_panel(pd.read_parquet(C.PANEL_PATH))
     T = len(per.fechas)
     idx, ok = indices_sombra(T, int(k))
-    y0 = per.y[idx]
     m0 = per.ym[idx] & ok
+    if objetivos is None:
+        y0 = per.y[idx]
+    else:
+        y0 = (per.y / per.sigma5)[idx] * per.sigma5
     en_test = np.zeros(T, bool)
     for _, te in folds(per):
         en_test[te] = True
-    # R² calibrado en los bloques de test 2011-2018 (F06 concentra su varianza en 2008-2009).
+    # R² calibrado en los bloques de test (F06 concentra su varianza en las crisis).
     sd = np.nanstd(np.where(m0 & en_test, y0, np.nan))
+    celdas_vf = celdas_vf or [(v, f) for v in VARIABLES for f in FORMAS]
     filas = []
-    celdas = [("ninguna", "ninguna", 0.0)] + [(v, f, r2) for v in VARIABLES for f in FORMAS for r2 in R2S if r2 > 0]
+    celdas = [("ninguna", "ninguna", 0.0)] + [(v, f, r2) for v, f in celdas_vf for r2 in r2s if r2 > 0]
     for var, forma, r2 in celdas:
         y = y0.copy()
         if r2 > 0:
             j = per.nombres.index(var)
             beta = sd * np.sqrt(r2 / (1 - r2)) * C.SIGNOS[var]
             y = y0 + beta * senal(per.X[:, j], forma, en_test)
-        p = per.con_y(y, m0)
-        for version in variantes:
-            C.AGREGACION, C.MODO_U2 = VARIANTES[version]
-            e1 = etapa1(p, R=r1, semilla=C.SEMILLA + 5000 + r)
-            t = e1["tabla"]
-            g = t[t.corte == "global"].set_index("variable")
-            pasan = set(t[t.pasa].variable)
-            fila = dict(replica=r, k=int(k), variable=var, forma=forma, r2=r2, version=version, q1=e1["q1"], q2=e1["q2"])
-            if var != "ninguna":
-                fila.update(
-                    U1=g.loc[var, "U1"],
-                    U2=g.loc[var, "U2"],
-                    pasa_global=bool(g.loc[var, "pasa"]),
-                    pasa_algun_corte=var in pasan,
-                    U1_supera_q1=bool(g.loc[var, "U1"] > e1["q1"]),
+        for objetivo in objetivos or ["y"]:
+            p = per.con_y(y / per.sigma5 if objetivo == "y_norm" else y, m0)
+            for version in variantes:
+                C.AGREGACION, C.MODO_U2 = VARIANTES[version]
+                e1 = etapa1(p, R=r1, semilla=C.SEMILLA + 5000 + r)
+                t = e1["tabla"]
+                g = t[t.corte == "global"].set_index("variable")
+                pasan = set(t[t.pasa].variable)
+                fila = dict(
+                    replica=r, k=int(k), variable=var, forma=forma, r2=r2, version=version, objetivo=objetivo,
+                    q1=e1["q1"], q2=e1["q2"],
                 )
-            fila["n_otras_pasan"] = len(pasan - {var})
-            filas.append(fila)
+                if var != "ninguna":
+                    fila.update(
+                        U1=g.loc[var, "U1"],
+                        U2=g.loc[var, "U2"],
+                        pasa_global=bool(g.loc[var, "pasa"]),
+                        pasa_algun_corte=var in pasan,
+                        U1_supera_q1=bool(g.loc[var, "U1"] > e1["q1"]),
+                    )
+                fila["n_otras_pasan"] = len(pasan - {var})
+                filas.append(fila)
     return filas
 
 
@@ -101,11 +113,17 @@ def main():
     ap.add_argument("--n-jobs", type=int, default=4)
     ap.add_argument("--variantes", default="v1_peor_fold,v2_mediana")
     ap.add_argument("--salida", default="potencia")
+    ap.add_argument("--objetivos", default=None, help="p. ej. y,y_norm (activa el ruido con volatilidad alineada)")
+    ap.add_argument("--celdas", default=None, help="p. ej. F01:lineal,F06:umbral")
+    ap.add_argument("--r2s", default=None, help="p. ej. 0.01,0.02,0.04")
     a = ap.parse_args()
     variantes = a.variantes.split(",")
-    per = Periodo.desde_panel(pd.read_parquet(C.CACHE / "panel.parquet"))
+    objetivos = a.objetivos.split(",") if a.objetivos else None
+    celdas_vf = [tuple(c.split(":")) for c in a.celdas.split(",")] if a.celdas else None
+    r2s = [float(x) for x in a.r2s.split(",")] if a.r2s else R2S
+    per = Periodo.desde_panel(pd.read_parquet(C.PANEL_PATH))
     ks = offsets(len(per.fechas), a.runs, C.SEMILLA + 7777)
-    res = Parallel(n_jobs=a.n_jobs, verbose=5)(delayed(una_replica)(r, k, a.r1, variantes) for r, k in enumerate(ks))
+    res = Parallel(n_jobs=a.n_jobs, verbose=5)(delayed(una_replica)(r, k, a.r1, variantes, celdas_vf, r2s, objetivos) for r, k in enumerate(ks))
     d = pd.DataFrame([f for filas in res for f in filas])
     dest = C.RAIZ / "resultados" / a.salida
     dest.mkdir(parents=True, exist_ok=True)
@@ -113,7 +131,7 @@ def main():
 
     plantadas = d[d.variable != "ninguna"]
     pot = (
-        plantadas.groupby(["version", "variable", "forma", "r2"])
+        plantadas.groupby(["version", "objetivo", "variable", "forma", "r2"])
         .agg(
             potencia=("pasa_global", "mean"),
             potencia_solo_U1=("U1_supera_q1", "mean"),
@@ -125,7 +143,7 @@ def main():
         )
         .reset_index()
     )
-    nula = d[d.variable == "ninguna"].groupby("version").agg(
+    nula = d[d.variable == "ninguna"].groupby(["version", "objetivo"]).agg(
         tasa_falsos_positivos=("n_otras_pasan", lambda s: (s > 0).mean()), q1_medio=("q1", "mean")
     )
     pot.to_csv(dest / "potencia_resumen.csv", index=False)

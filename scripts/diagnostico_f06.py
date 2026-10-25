@@ -74,7 +74,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--replicas", type=int, default=30)
     a = ap.parse_args()
-    per = Periodo.desde_panel(pd.read_parquet(C.CACHE / "panel.parquet"))
+    per = Periodo.desde_panel(pd.read_parquet(C.PANEL_PATH))
     j_sel = [per.nombres.index(v) for v in VARS]
     Xr = per.X[:, j_sel]
     fl = folds(per)

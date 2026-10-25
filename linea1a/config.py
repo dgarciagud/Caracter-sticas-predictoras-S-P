@@ -73,7 +73,13 @@ VAL_INI, VAL_FIN = (pd.Timestamp(d) for d in _m["validacion"])
 HOLDOUT_INI = pd.Timestamp(_m["holdout"][0])
 H = int(_m["horizonte_sesiones"])
 
-TEST_INI, TEST_FIN = pd.Timestamp("2011-01-01"), pd.Timestamp("2018-12-31")
+_tests = PREREG["folds"].get("ventana_test", ["2011-01-01", "2018-12-31"])
+TEST_INI, TEST_FIN = (pd.Timestamp(d) for d in _tests)
+# Fecha desde la que se cargan los datos diarios (lookbacks); el panel de cada inicio se cachea aparte.
+INICIO_CARGA = str(_m.get("inicio_carga", "2003-01-01"))
+PANEL_PATH = CACHE / ("panel.parquet" if INICIO_CARGA == "2003-01-01" else f"panel_{INICIO_CARGA[:4]}.parquet")
+# Objetivo de la selección: "y" (retorno log en exceso) o "y_norm" (y / sigma_5 prevista en t).
+OBJETIVO = str(_m.get("objetivo", "y"))
 N_FOLDS = 5
 EMBARGO_SEMANAS = int(PREREG["folds"]["embargo_semanas"])
 MIN_CELDA = int(PREREG["regimenes"]["minimo_semanas_celda"])
