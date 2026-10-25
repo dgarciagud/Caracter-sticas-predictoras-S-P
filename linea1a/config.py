@@ -7,16 +7,17 @@ import os
 import sys
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 import yaml
 
 RAIZ = Path(__file__).resolve().parents[1]
-PREREG_PATH = RAIZ / "preregistro" / "preregistro_1A.yaml"
-RESULTADOS = RAIZ / "resultados"
-FIGURAS = RESULTADOS / "figuras"
+# La versión activa del pre-registro se elige con LINEA1A_PREREG (por defecto, la v1 original).
+PREREG_PATH = Path(os.environ.get("LINEA1A_PREREG", RAIZ / "preregistro" / "preregistro_1A.yaml")).resolve()
 CACHE = RAIZ / "cache"
 DATA_REF = RAIZ / "data_ref"
-TRIALS_PATH = RESULTADOS / "trials.jsonl"
+# Un único registro de ensayos para todas las versiones: el DSR y el PBO usan el recuento acumulado.
+TRIALS_PATH = RAIZ / "resultados" / "trials.jsonl"
 
 # Repositorio de Stefan Jansen (ML for Trading, 3.ª ed.): sus loaders `data.*` y sus datos.
 ML4T_REPO = Path(os.environ.get("ML4T_REPO", RAIZ.parent / "ml4t" / "machine-learning-for-trading"))
@@ -44,6 +45,18 @@ def hash_prereg() -> str:
 
 
 PREREG = cargar_prereg()
+VERSION = str(PREREG.get("version", "v1"))
+RESULTADOS = RAIZ / "resultados" if VERSION == "v1" else RAIZ / "resultados" / VERSION
+FIGURAS = RESULTADOS / "figuras"
+
+# Cómo se resume un estadístico sobre los folds: "min" (peor fold, v1) o "mediana".
+AGREGACION = PREREG.get("agregacion_folds", "min")
+
+
+def agregar_folds(a, axis: int = -1):
+    return np.nanmin(a, axis) if AGREGACION == "min" else np.nanmedian(a, axis)
+
+
 CANDIDATAS: list[str] = list(PREREG["candidatas"])
 SIGNOS: dict[str, int] = {k: int(v["signo"]) for k, v in PREREG["candidatas"].items()}
 EXCEPCIONES: list[str] = list(PREREG["excepciones_teoricas"])

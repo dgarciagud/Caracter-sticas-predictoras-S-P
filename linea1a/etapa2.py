@@ -134,12 +134,12 @@ def _agregar(res_folds, k, signos):
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", RuntimeWarning)
         return dict(
-            L1_ridge=np.nanmin(apilar("coef_ridge"), 0),
-            L1_enet=np.nanmin(apilar("coef_enet"), 0),
-            G1=np.nanmin(apilar("G1"), 0),
-            G2=np.nanmin(apilar("G2"), 0),
+            L1_ridge=C.agregar_folds(apilar("coef_ridge"), 0),
+            L1_enet=C.agregar_folds(apilar("coef_enet"), 0),
+            G1=C.agregar_folds(apilar("G1"), 0),
+            G2=C.agregar_folds(apilar("G2"), 0),
             G3=np.nanmedian(apilar("G3", con_signo=False), 0),
-            I1=np.nanmin(apilar("I1"), 0),
+            I1=C.agregar_folds(apilar("I1"), 0),
             signo_ridge=np.sign(np.nanmedian(apilar("coef_ridge", con_signo=False), 0)),
             signo_gbm=np.sign(np.nanmedian(apilar("G1", con_signo=False), 0)),
         )

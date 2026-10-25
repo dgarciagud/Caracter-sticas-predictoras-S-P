@@ -134,8 +134,8 @@ def _stats_celdas(per: Periodo, fl, X_src: np.ndarray, idx: np.ndarray, okm: np.
         st = np.where(con[None, :, None], signos[None, :, None] * t_f, np.abs(t_f))
         sr = np.where(con[None, :, None], signos[None, :, None] * r_f, np.abs(r_f))
         with np.errstate(all="ignore"):
-            U1[:, ci, :] = np.nanmin(st, -1)
-            U2[:, ci, :] = np.nanmin(sr, -1)
+            U1[:, ci, :] = C.agregar_folds(st, -1)
+            U2[:, ci, :] = C.agregar_folds(sr, -1)
     return U1, U2, signo_ok
 
 

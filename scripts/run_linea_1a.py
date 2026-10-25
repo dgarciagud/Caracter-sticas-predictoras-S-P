@@ -31,7 +31,7 @@ from linea1a.seleccion import n_estables, seleccionar_catalogo, variables_modelo
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 PANEL = C.CACHE / "panel.parquet"
-SEL = C.CACHE / "seleccion_real.joblib"
+SEL = C.CACHE / ("seleccion_real.joblib" if C.VERSION == "v1" else f"seleccion_real_{C.VERSION}.joblib")
 R = C.RESULTADOS
 
 

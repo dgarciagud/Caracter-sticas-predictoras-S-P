@@ -16,7 +16,12 @@ Datos y librerías del repositorio de Stefan Jansen, *Machine Learning for Tradi
 | Volatilidades y medias | `ml4t-engineer`: `ewma_volatility`, `realized_volatility`, `sma` |
 | DSR y PBO | `ml4t-diagnostic`: `deflated_sharpe_ratio`, `compute_pbo` |
 
-**El informe con los resultados está en [`resultados/INFORME_1A.md`](resultados/INFORME_1A.md).**
+**Informes:** [`resultados/INFORME_1A.md`](resultados/INFORME_1A.md) (v1, peor fold, pre-registro original) y
+[`resultados/v2_mediana/INFORME_1A_v2.md`](resultados/v2_mediana/INFORME_1A_v2.md) (v2, mediana de los folds,
+reapertura del pre-registro tras ver la v1).
+
+Para ejecutar una versión distinta de la v1: `export LINEA1A_PREREG=preregistro/preregistro_1A_v2_mediana.yaml`.
+Los resultados van a `resultados/<version>/` y `trials.jsonl` acumula los ensayos de todas las versiones.
 
 ## Estructura
 

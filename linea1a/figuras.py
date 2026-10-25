@@ -69,7 +69,7 @@ def etapa1_folds(tf: pd.DataFrame, tabla: pd.DataFrame, q1: float, ruta) -> None
         ax.scatter(d.t_con_signo, range(len(orden)), s=36, color=COLORES[f - 1], marker=MARCAS[f - 1],
                    edgecolor="#fcfcfb", linewidth=1, label=f"fold {f}", zorder=3)
     ax.scatter(g.loc[orden, "U1"], range(len(orden)), s=90, facecolor="none", edgecolor="#0b0b0b", lw=1.2,
-               label="U1 (peor fold)", zorder=4)
+               label="U1 (peor fold)" if C.AGREGACION == "min" else "U1 (mediana de folds)", zorder=4)
     ax.axvline(q1, color="#0b0b0b", ls="--", lw=1)
     ax.text(q1, len(orden) - 0.4, f" q1 = {q1:.2f}", fontsize=8, va="bottom", color="#52514e")
     ax.axvline(0, color="#c3c2b7", lw=0.8)

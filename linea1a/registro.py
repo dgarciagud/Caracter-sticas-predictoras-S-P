@@ -37,6 +37,7 @@ def registrar(
         fecha=datetime.now(timezone.utc).isoformat(timespec="seconds"),
         linea="1A",
         periodo=periodo,
+        version_prereg=C.VERSION,
         hash_prereg=C.hash_prereg(),
         variables=variables,
         modelo=modelo,
