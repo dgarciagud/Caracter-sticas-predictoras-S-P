@@ -23,6 +23,8 @@ reapertura del pre-registro tras ver la v1) y
 [`resultados/v4/INFORME_1A_v4.md`](resultados/v4/INFORME_1A_v4.md) (v4, test 1997-2018 y objetivo normalizado; potencia 93 % a R² 2 %) y
 [`resultados/v5/INFORME_1A_v5.md`](resultados/v5/INFORME_1A_v5.md) (v5, umbrales calibrados al 5 % de error total; **F05 estable condicional**, holdout sin abrir).
 
+Línea 1B: [`resultados/1B/INFORME_1B.md`](resultados/1B/INFORME_1B.md) (la regla primaria no pasa la puerta de 8.2; 1B se detiene).
+
 Prueba de potencia de la etapa 1 (datos sintéticos): [`resultados/potencia/INFORME_POTENCIA.md`](resultados/potencia/INFORME_POTENCIA.md).
 
 Para ejecutar una versión distinta de la v1: `export LINEA1A_PREREG=preregistro/preregistro_1A_v2_mediana.yaml`.
