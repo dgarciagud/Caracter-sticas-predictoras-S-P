@@ -51,7 +51,12 @@ def paso_volatilidad(_):
 def paso_regla(_):
     d = volatilidad.cargar_diario()
     v = pd.read_parquet(VOL)
-    ev = regla.eventos(d, v["sigma5_har"], C.DESC_INI, C.DESC_FIN)
+    if C.REGLA == "reversion":
+        senal = regla.senal_reversion(d, v["sigma5_har"])
+    else:
+        panel = pd.read_parquet(C.CACHE / "panel_1988.parquet")  # panel semanal de la 1A v4/v5 (F05, R_trend)
+        senal = regla.senal_vix_alcista(panel)
+    ev = regla.eventos(d, v["sigma5_har"], C.DESC_INI, C.DESC_FIN, senal)
     ev.to_csv(R / "02_eventos_descubrimiento.csv")
     media, t = media_nw(ev.ret_neto.to_numpy())
     res = dict(
@@ -64,7 +69,7 @@ def paso_regla(_):
         ret_medio_por_salida=ev.groupby("motivo").ret_neto.mean().to_dict(),
         cumple_requisito=bool(media > 0 and t > C.T_MIN_REGLA),
     )
-    registro.registrar(periodo="descubrimiento", modelo="regla_primaria_reversion", variables=[],
+    registro.registrar(periodo="descubrimiento", modelo=f"regla_primaria_{C.REGLA}", variables=[],
                        hiperparametros=dict(umbral=C.UMBRAL_REGLA, barrera=C.BARRERA, coste=C.COSTE_IDA_VUELTA),
                        metricas=res)
     json.dump(res, open(R / "02_regla_primaria.json", "w"), indent=2, default=float)

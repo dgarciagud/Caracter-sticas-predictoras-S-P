@@ -12,12 +12,16 @@ import yaml
 RAIZ = Path(__file__).resolve().parents[1]
 PREREG_PATH = Path(os.environ.get("LINEA1B_PREREG", RAIZ / "preregistro" / "preregistro_1B.yaml")).resolve()
 PREREG_1A = RAIZ / "preregistro" / "preregistro_1A_v5.yaml"  # catálogo y definiciones de las meta-features
-RESULTADOS = RAIZ / "resultados" / "1B"
-FIGURAS = RESULTADOS / "figuras"
 CACHE = RAIZ / "cache"
 
 with open(PREREG_PATH, encoding="utf-8") as f:
     PREREG = yaml.safe_load(f)
+
+VERSION = str(PREREG["version"])
+RESULTADOS = RAIZ / "resultados" / "1B" if VERSION == "1B-v1" else RAIZ / "resultados" / "1B" / VERSION.split("-")[1]
+FIGURAS = RESULTADOS / "figuras"
+# Regla primaria: "reversion" (1B-v1) o "vix_alcista" (1B-v2).
+REGLA = "reversion" if VERSION == "1B-v1" else "vix_alcista"
 
 
 def hash_prereg() -> str:

@@ -1,0 +1,18 @@
+{
+  "eventos": 199,
+  "eventos_por_anio": 7.6550552922590835,
+  "media_ret_neto": 0.004386714220323745,
+  "t_nw": 3.879065249951505,
+  "tasa_acierto_meta_label": 0.6381909547738693,
+  "salidas": {
+    "toma_beneficio": 83,
+    "vertical": 79,
+    "stop": 37
+  },
+  "ret_medio_por_salida": {
+    "stop": -0.020085172075454048,
+    "toma_beneficio": 0.018643144390663835,
+    "vertical": 0.0008699558507737543
+  },
+  "cumple_requisito": true
+}

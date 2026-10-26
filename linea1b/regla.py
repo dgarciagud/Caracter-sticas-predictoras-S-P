@@ -16,7 +16,20 @@ def fechas_decision(index: pd.DatetimeIndex) -> pd.DatetimeIndex:
     return index[index == ultimo.to_numpy()]
 
 
-def eventos(d: pd.DataFrame, sigma5: pd.Series, ini, fin) -> pd.DataFrame:
+def senal_reversion(d: pd.DataFrame, sigma5: pd.Series) -> pd.Series:
+    """1B-v1: retorno a 5 días por debajo de -1,5 sigma5."""
+    lp = np.log(d["close"])
+    return (lp - lp.shift(C.H)) < -C.UMBRAL_REGLA * sigma5
+
+
+def senal_vix_alcista(panel: pd.DataFrame) -> pd.Series:
+    """1B-v2: F05 por encima de su percentil 80 de las 156 semanas anteriores y R_trend = 1 (panel semanal de la 1A)."""
+    f05 = panel["F05"]
+    p80 = f05.shift(1).rolling(156, min_periods=156).quantile(0.80)
+    return (f05 > p80) & (panel["R_trend"] == 1) & p80.notna()
+
+
+def eventos(d: pd.DataFrame, sigma5: pd.Series, ini, fin, senal: pd.Series) -> pd.DataFrame:
     """Eventos de la regla en [ini, fin] con salida por barreras; solo los que cierran antes de `fin`."""
     lp = np.log(d["close"])
     r5 = lp - lp.shift(C.H)
@@ -26,7 +39,7 @@ def eventos(d: pd.DataFrame, sigma5: pd.Series, ini, fin) -> pd.DataFrame:
         if not (ini <= t <= fin):
             continue
         s = sigma5.get(t, np.nan)
-        if not np.isfinite(s) or not r5.loc[t] < -C.UMBRAL_REGLA * s:
+        if not np.isfinite(s) or not bool(senal.get(t, False)):
             continue
         i = pos[t]
         if i + C.H >= len(d) or d.index[i + C.H] > fin:

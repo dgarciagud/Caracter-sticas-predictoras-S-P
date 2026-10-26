@@ -47,3 +47,29 @@ Ensayo registrado en `trials.jsonl` (línea 1B).
   umbral (p. ej. −1,0 σ̂₅, que daría más eventos), una regla basada en el hallazgo de la 1A (por ejemplo, comprar tras
   subidas fuertes del VIX en mercado alcista, coherente con F05) o la regla pre-FOMC que menciona la especificación.
   Cualquiera de ellas tendría que pasar la misma puerta antes de construir el meta-label.
+
+## 1B-v2 · Regla primaria basada en la 1A (subida del VIX en mercado alcista)
+
+Pre-registro `preregistro/preregistro_1B_v2.yaml` (SHA-256 `28903287…21bf`), fechado antes de construir sus eventos.
+Regla: comprar al cierre de la semana t si F05 (cambio log del VIX a 5 días) supera su percentil 80 de las 156
+semanas anteriores y el índice está sobre su SMA200; mismas barreras, costes y puerta que la v1.
+Resultados en `resultados/1B/v2/`.
+
+| | Resultado | Requisito |
+| --- | --- | --- |
+| Eventos 1993-2018 | **199** (7,7 al año) | — |
+| Retorno neto medio por evento | **+0,44 %** | > 0 ✓ |
+| t Newey-West | **3,88** | > 1,5 ✓ |
+| Meta-label = 1 (acierto) | 64 % | — |
+| Salidas | 83 tomas de beneficio, 79 verticales, 37 stops | — |
+
+Retorno neto medio por subperiodo: 1993-97 +0,60 % (48), 1998-01 +0,02 % (26), 2002-05 +0,46 % (21),
+2006-10 +0,49 % (35), 2011-14 +0,35 % (32), 2015-18 +0,54 % (37). Positivo en los seis.
+
+**Pasa la puerta de 8.2**, pero con una advertencia fuerte: **es circular**. F05 se seleccionó en la 1A con los
+mismos datos de 1993-2018, así que esta t no es evidencia independiente. La prueba real es la validación 2019-2022
+(y, en su día, el holdout).
+
+**Problema para el meta-label**: dentro de los eventos, R_trend vale siempre 1 (forma parte de la regla) y F05 está
+truncada por encima de su p80. Las meta-features previstas apenas tienen variación: solo quedan R_vol (78 eventos
+con VIX alto, 121 con VIX bajo) y la magnitud de F05 dentro de los eventos.
