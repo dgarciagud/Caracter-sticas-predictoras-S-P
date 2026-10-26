@@ -1,0 +1,54 @@
+# Pre-registro de la línea 1B (meta-label sobre una regla primaria de reversión)
+# Fechado antes de construir eventos, barreras o meta-labels. Su SHA-256 va en cada entrada de trials.jsonl (linea 1B).
+fecha: "2026-10-26"
+version: "1B-v1"
+especificacion: "Líneas 1A y 1B · Especificación S&P 500 a 5 días, sección 8"
+catalogo_1A: "preregistro_1A_v5.yaml: F05 estable condicional (R_trend = 1), F14 redundante"
+
+muestra:   # mismos periodos que la 1A v5 (8.9)
+  inicio_carga: "1988-01-01"
+  descubrimiento: ["1993-01-01", "2018-12-31"]
+  ventana_test: ["1997-01-01", "2018-12-31"]   # 5 bloques de igual duración, walk-forward expansivo
+  validacion: ["2019-01-01", "2022-12-31"]
+  holdout: ["2023-01-01", "2025-12-31"]        # sellado; se abre una sola vez junto con la 1A
+  decision: "cierre del último día hábil de cada semana ISO"
+
+volatilidad:   # 8.1; no cuenta como hallazgo de 1B
+  objetivo: "RV5 futura = suma de r_d^2 en (t, t+5], r_d = log-retorno diario cierre a cierre"
+  modelo: "HAR-RV con VIX en logaritmos: log RV5f = a + b_d log(5 RV_d) + b_w log(5 RV_w) + b_m log(5 RV_m) + b_v log(5 VIX^2/252/10^4)"
+  regresores: "RV_d = r_t^2; RV_w = media de r^2 en 5 sesiones; RV_m = media de r^2 en 22 sesiones; VIX al cierre de t"
+  prediccion: "sigma5 = sqrt(exp(prediccion + varianza residual / 2))"
+  reestimacion: "mensual, ventana expansiva desde 1990-01, solo con objetivos ya realizados en la fecha de reestimación"
+  comparacion: "QLIKE semanal frente a GJR-GARCH(1,1,1) t de Student con la misma ventana expansiva mensual (paquete arch)"
+
+regla_primaria:   # 8.2
+  definicion: "comprar al cierre de la semana t si log(P_t/P_{t-5}) < -1,5 * sigma5_t"
+  barreras: {toma_beneficio: "+1,0 * sigma5_t desde la entrada", stop: "-1,0 * sigma5_t desde la entrada", vertical: "5 sesiones"}
+  ejecucion_barreras: "se comprueban con el máximo y el mínimo diarios del índice; la salida es al precio de la barrera, salvo que la apertura ya la haya cruzado (hueco), en cuyo caso la salida es la apertura; si un mismo día toca las dos, se supone el stop primero"
+  costes: "2 pb por lado (4 pb ida y vuelta) sobre el retorno del evento"
+  retorno_evento: "log-retorno de la entrada a la salida menos costes"
+  requisito_previo: "en descubrimiento, media del retorno neto por evento > 0 con t Newey-West > 1,5 (rezagos floor(4 (n/100)^(2/9))); si no se cumple, 1B se detiene"
+
+meta_label:   # 8.3
+  definicion: "1 si toca primero la toma de beneficio, o llega a la vertical con retorno neto > 0; 0 en otro caso"
+  pesos: "unicidad (media de 1/concurrencia sobre la vida del evento) × |retorno único|, normalizados a sumar el número de eventos"
+
+meta_features: [F05, R_vol, R_trend]   # definiciones de la 1A; F14 (redundante) se deja fuera por decisión del usuario
+
+etapa1_1B:   # 8.6, con las convenciones de la 1A v5
+  estadistico: "AUC de la feature frente al meta-label por fold de test; U = media de folds de signo*(AUC - 0,5); signo: F05 +, R_vol y R_trend sin signo previo (|AUC - 0,5|)"
+  sombras: "la feature se desplaza en el calendario semanal completo (k >= 52 semanas) y se lee en las fechas de los eventos; R = 1.000"
+  umbral: "percentil p del máximo entre features; p calibrado como en la 1A v5 (nula del procedimiento <= 5 %), con la regla fijada aquí"
+
+etapa2_1B:   # 8.7
+  modelos: "logística L2 (principal, C por validación interna, calibración de Platt) y EBM (secundario)"
+  sombras: "R = 100 réplicas conjuntas"
+  validacion_cruzada: "purga y embargo de 5 sesiones sobre los eventos"
+
+decision_y_tamano: {operar: "p > 0,55", tamano: "min(2p - 1, 1) × riesgo base, riesgo base = objetivo de volatilidad / sigma5"}
+
+evaluacion:   # 8.9
+  metricas: [AUC, Brier, "precisión con p > 0,55", "número de operaciones", "Sharpe neto del primario filtrado frente al primario solo"]
+  nula_filtro: "1.000 filtros aleatorios con el mismo número de eventos por año; el filtro real debe superar su p95 en Sharpe neto"
+  nula_procedimiento: "meta-labels desplazados circularmente sobre la secuencia de eventos, R = 100"
+  dsr_pbo: "con los ensayos de 1B sumados a los de 1A"
