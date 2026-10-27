@@ -73,3 +73,51 @@ mismos datos de 1993-2018, así que esta t no es evidencia independiente. La pru
 **Problema para el meta-label**: dentro de los eventos, R_trend vale siempre 1 (forma parte de la regla) y F05 está
 truncada por encima de su p80. Las meta-features previstas apenas tienen variación: solo quedan R_vol (78 eventos
 con VIX alto, 121 con VIX bajo) y la magnitud de F05 dentro de los eventos.
+
+### Meta-label de la 1B-v2 (anexo del pre-registro fijado antes de calcularlo, SHA-256 `a6ecb170…076e`)
+
+**Calibración del percentil** (100 conjuntos con los meta-labels desplazados sobre la secuencia de eventos,
+`03_calibracion_*.csv`): fracción con alguna meta-feature en el meta-modelo = 1 % con p de 95 a 70, 3 % con p = 65,
+6 % con p = 60 y 8 % con p = 50 → **p\* = 65**.
+
+**Etapa 1** (AUC por fold frente al meta-label, media de folds; umbral 0,078 con p = 65; `04_etapa1.csv`):
+
+| Meta-feature | U | Umbral | p perm. | Acierto tercil alto − bajo |
+| --- | --- | --- | --- | --- |
+| F05 (magnitud dentro de los eventos) | −0,009 | 0,078 | 1,00 | +3,0 pp |
+| R_vol | 0,070 | 0,078 | 0,49 | +0,5 pp |
+
+**Ninguna pasa**: no hay etapa 2 y el meta-modelo es la tasa base de acierto. El filtro con p > 0,55 opera todos
+los eventos con tamaño constante, es decir, equivale a la regla primaria sola.
+
+### Validación 2019-2022 (primera prueba no circular de la regla; `05_*`)
+
+| | Descubrimiento 1993-2018 | **Validación 2019-2022** |
+| --- | --- | --- |
+| Eventos | 199 (7,7/año) | **25** (5 en 2019, 8 en 2020, 12 en 2021, 0 en 2022) |
+| Retorno neto medio por evento | +0,44 % | **+0,39 %** |
+| t Newey-West | 3,88 | **0,99** |
+| Acierto (meta-label = 1) | 64 % | 56 % |
+| Salidas | 83 TP · 79 vertical · 37 stop | 7 TP · 10 vertical · 8 stop |
+
+| Estrategia (P&L semanal, 0 sin operación) | Operaciones | Sharpe neto | Rentab. anual | Vol. anual |
+| --- | --- | --- | --- | --- |
+| Primario solo | 25 | 0,11 | 0,42 % | 3,8 % |
+| Primario filtrado (tasa base) | 25 | 0,10 | 0,11 % | 1,1 % |
+
+- El retorno medio por evento fuera de muestra (+0,39 %) es casi igual al de descubrimiento (+0,44 %), lo que es
+  **coherente con la regla**, pero con 25 eventos el t es 0,99: **no es significativo**. 2022 no tiene eventos
+  porque el índice pasó casi todo el año bajo su SMA200.
+- El filtro no aporta (no hay meta-features); el AUC de 0,42 que sale en la tabla de `05_validacion.csv` no es
+  interpretable: la probabilidad es la tasa base, constante dentro de cada año.
+- Nula de filtros aleatorios: el filtro no la supera (p = 0,99). DSR del líder (primario) = 0,66 con 35 ensayos
+  acumulados de 1A y 1B; PBO = 0,38 con 2 estrategias distintas.
+
+### Conclusión de la 1B
+
+- La regla F05 en mercado alcista mantiene el signo y el tamaño fuera de muestra, pero la validación es
+  demasiado corta para confirmarla (25 eventos, t ≈ 1), y su t de descubrimiento es circular.
+- El meta-label no encuentra nada que filtre: ni la intensidad del pico de VIX ni el régimen de volatilidad predicen
+  qué eventos aciertan.
+- Criterios del holdout para la 1B: no hay filtro que validar (nula de filtros no superada, DSR 0,66 < 0,95).
+  Sumado a que la 1A tampoco cumplió los suyos, **el holdout 2023-2025 no se abre**.
