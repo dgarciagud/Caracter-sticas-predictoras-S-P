@@ -56,3 +56,21 @@ evaluacion:   # 8.9
   nula_filtro: "1.000 filtros aleatorios con el mismo número de eventos por año; el filtro real debe superar su p95 en Sharpe neto"
   nula_procedimiento: "meta-labels desplazados circularmente sobre la secuencia de eventos, R = 100"
   dsr_pbo: "con los ensayos de 1B sumados a los de 1A"
+
+# ANEXO (2026-10-27), fijado después de la puerta de 8.2 y ANTES de calcular cualquier estadístico del meta-label o de
+# mirar 2019-2022. Concreta lo que la especificación deja abierto; no cambia nada de lo anterior.
+anexo_meta_label:
+  meta_features_efectivas: [F05, R_vol]   # R_trend = 1 en todos los eventos (forma parte de la regla): se excluye
+  signos: {F05: 1, R_vol: 0}
+  folds: "5 bloques de test de igual duración en 1997-2018 sobre los eventos; entrenamiento expansivo desde 1993; purga de eventos cuyo fin sea posterior al inicio del test; embargo de 5 sesiones"
+  pesos: "unicidad × |ret_neto|, normalizados a sumar el número de eventos (se usan en la logística y el EBM)"
+  etapa1: "U = media de folds de signo*(AUC - 0,5) (|AUC - 0,5| sin signo); se informa también la diferencia de tasa de acierto tercil alto - bajo"
+  etapa2_logistica: "LogisticRegression L2, C por validación interna (TimeSeriesSplit 3 sobre el entrenamiento, solo variables reales, congelado para las réplicas); estadístico = media de folds de signo*coeficiente estandarizado"
+  etapa2_ebm: "ExplainableBoostingClassifier(interactions=0, min_samples_leaf=20, outer_bags=4); estadísticos G1 = pendiente de la contribución de la feature sobre x y G3 = media del |término|, media de folds"
+  clasificacion: "entra al meta-modelo si pasa la etapa 1 y cumple en la logística (y en el EBM, si su signo coincide); sin features, el meta-modelo es la tasa base y el filtro equivale al primario solo"
+  umbral: "un único percentil p para todos los umbrales; p* = el más bajo de la rejilla 95..50 con <= 5 % de nulas (meta-labels desplazados circularmente sobre los eventos, 100 corridas) que dejen alguna feature en el meta-modelo"
+  calibracion_probabilidad: "Platt (CalibratedClassifierCV sigmoid, cv=3) dentro del entrenamiento de cada fold"
+  objetivo_volatilidad: "mediana de sigma5 de los eventos de descubrimiento; riesgo base = objetivo / sigma5_t"
+  validacion: "eventos de la regla en 2019-2022; meta-modelo reentrenado cada año con todos los eventos anteriores; Sharpe neto semanal (0 las semanas sin operación) anualizado con raíz de 52"
+  estrategias: ["primario solo (tamaño = riesgo base)", "primario filtrado con la logística", "primario filtrado con el EBM"]
+  nula_filtro: "1.000 filtros que eligen al azar el mismo número de eventos por año que el filtro real, con los tamaños del filtro real permutados"
