@@ -125,4 +125,4 @@ los eventos con tamaño constante, es decir, equivale a la regla primaria sola.
 ### Nula del procedimiento de la 1B (100 corridas, meta-labels desplazados, p = 65; `06_nula_procedimiento.csv`)
 
 6/100 corridas dejan alguna meta-feature en el meta-modelo (R_vol: 5, F05: 1).
-El resultado real (ninguna) está dentro de lo esperable bajo la nula; la calibración se mantiene en el entorno del 3-5 %.
+Es un 6 % (IC 95 % aprox. 2-13 %), algo por encima del 3 % de la calibración y del 5 % objetivo, dentro del margen de 100 corridas; el procedimiento es ligeramente menos conservador de lo calibrado. No afecta a la decisión: el meta-modelo real no tiene features.
