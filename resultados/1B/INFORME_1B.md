@@ -121,3 +121,8 @@ los eventos con tamaño constante, es decir, equivale a la regla primaria sola.
   qué eventos aciertan.
 - Criterios del holdout para la 1B: no hay filtro que validar (nula de filtros no superada, DSR 0,66 < 0,95).
   Sumado a que la 1A tampoco cumplió los suyos, **el holdout 2023-2025 no se abre**.
+
+### Nula del procedimiento de la 1B (100 corridas, meta-labels desplazados, p = 65; `06_nula_procedimiento.csv`)
+
+6/100 corridas dejan alguna meta-feature en el meta-modelo (R_vol: 5, F05: 1).
+El resultado real (ninguna) está dentro de lo esperable bajo la nula; la calibración se mantiene en el entorno del 3-5 %.
