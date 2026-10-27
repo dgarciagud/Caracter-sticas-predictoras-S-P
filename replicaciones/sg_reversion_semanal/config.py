@@ -6,12 +6,17 @@ importa linea1a.registro. Todo lo que produce va a replicaciones/sg_reversion_se
 
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent
 CACHE = RAIZ / "cache"
-RESULTADOS = RAIZ / "resultados"
+# v2: sólo precio y volumen (resultados/). v3: + fundamentales XBRL, dividendos y sustitutos de las
+# revisiones de BPA (resultados/v3/). Mismo modelo, cartera y análisis en las dos.
+VERSION = os.environ.get("SG_VERSION", "v3")
+RESULTADOS = RAIZ / "resultados" if VERSION == "v2" else RAIZ / "resultados" / VERSION
 FIGURAS = RESULTADOS / "figuras"
+SUFIJO = "" if VERSION == "v2" else f"_{VERSION}"
 
 # Universo: componentes del S&P 500 en barras diarias AlgoSeek (Jansen), 2017-01-03 a 2021-12-31.
 INICIO_ETF = "2016-01-01"

@@ -18,8 +18,8 @@ from .caracteristicas import FEATURES, rangos
 
 
 def walk_forward(panel: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
-    ruta = C.CACHE / "predicciones.parquet"
-    ruta_shap = C.CACHE / "shap.npz"
+    ruta = C.CACHE / f"predicciones{C.SUFIJO}.parquet"
+    ruta_shap = C.CACHE / f"shap{C.SUFIJO}.npz"
     if ruta.exists() and ruta_shap.exists():
         z = np.load(ruta_shap, allow_pickle=True)
         return pd.read_parquet(ruta), {k: z[k] for k in z.files}

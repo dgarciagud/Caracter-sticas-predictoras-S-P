@@ -1,0 +1,18 @@
+,,ret_anual_bruto
+patas_reversion,Larga vs mercado,0.0741
+patas_reversion,Mercado vs corta,0.0696
+dia_reversion,Lunes,0.0503
+dia_reversion,Martes,0.0573
+dia_reversion,Miércoles,0.1437
+dia_reversion,Jueves,0.1518
+dia_reversion,Viernes,0.0931
+dia_ml,Lunes,-0.0143
+dia_ml,Martes,-0.0012
+dia_ml,Miércoles,0.0069
+dia_ml,Jueves,0.0063
+dia_ml,Viernes,-0.0065
+lags_ml_miercoles,lag 0,0.0069
+lags_ml_miercoles,lag 1,0.0113
+lags_ml_miercoles,lag 2,0.0116
+lags_ml_miercoles,lag 3,0.0198
+lags_ml_miercoles,lag 4,0.0126

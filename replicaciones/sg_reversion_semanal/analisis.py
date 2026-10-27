@@ -27,6 +27,24 @@ FACTORES = {
     "Low Beta": ("beta_12m", -1),
     "Low Size (ADV)": ("log_adv_6m", -1),
 }
+# Paneles de exposiciones (como los dos gráficos de la pág. 4) y serie de atribución.
+PANEL_A = ["Low Vol", "Low Beta", "Low Size (ADV)"]
+PANEL_B = ["1-week Return (reversal)", "12-month Price Momentum", "3-month Price Momentum"]
+SERIE_ATR = ["Residual", "1-week Return (reversal)", "12-month Price Momentum", "3-month Price Momentum", "Low Vol"]
+if C.VERSION != "v2":
+    FACTORES.pop("Low Size (ADV)")
+    FACTORES.update({
+        "Low Size": ("log_mcap", -1),
+        "Value": ("valor", 1),
+        "Quality": ("calidad", 1),
+        "Growth": ("crecimiento", 1),
+        "Dividend Yield": ("div_yield", 1),
+        "SUE (≈ revisiones BPA)": ("sue", 1),
+        "EAR (≈ revisiones BPA)": ("ear", 1),
+    })
+    PANEL_A = ["Value", "Quality", "Growth", "Low Vol", "Dividend Yield"]
+    PANEL_B = PANEL_B + ["SUE (≈ revisiones BPA)", "EAR (≈ revisiones BPA)"]
+    SERIE_ATR = ["Residual", "1-week Return (reversal)", "12-month Price Momentum", "SUE (≈ revisiones BPA)", "EAR (≈ revisiones BPA)"]
 
 
 def _guardar(fig, nombre: str) -> None:
@@ -171,14 +189,13 @@ class Replica:
         ultimo = atr[anio_fin].drop(columns="total").sum().sort_values()
 
         fig, ax = plt.subplots(2, 2, figsize=(12, 8))
-        rev_mom = ["1-week Return (reversal)", "12-month Price Momentum", "3-month Price Momentum"]
-        resto = ["Low Vol", "Low Beta", "Low Size (ADV)"]
+        rev_mom, resto = PANEL_B, PANEL_A
         for j, n in enumerate(resto):
             ax[0, 0].plot(expo[n].rolling(12).mean(), color=COLORES[j], label=n)
         for j, n in enumerate(rev_mom):
             ax[0, 1].plot(expo[n].rolling(12).mean(), color=COLORES[j], label=n)
         ax[0, 0].set_title("Exposiciones del ML semanal (media 12 semanas, z)")
-        ax[0, 1].set_title("Exposiciones a reversión y momentum (media 12 semanas, z)")
+        ax[0, 1].set_title("Reversión y momentum de precio/beneficios (media 12 semanas, z)")
         (anual * 100).plot.barh(ax=ax[1, 0], color=COLORES[0])
         ax[1, 0].set_title("Atribución (% anualizado, bruto lag 1, 2018-2021)")
         (ultimo * 100).plot.barh(ax=ax[1, 1], color=COLORES[1])
@@ -190,7 +207,7 @@ class Replica:
         _guardar(fig, "04_exposiciones_atribucion")
 
         fig, ax = plt.subplots(figsize=(7, 4))
-        for j, n in enumerate(["Residual", "1-week Return (reversal)", "12-month Price Momentum", "3-month Price Momentum", "Low Vol"]):
+        for j, n in enumerate(SERIE_ATR):
             ax.plot(_curva(atr[n]), color=COLORES[j], label=n)
         ax.set_title("Serie temporal de la atribución (bruto, lag 1)")
         ax.legend(fontsize=8)
@@ -306,9 +323,16 @@ class Replica:
         z = _z(d, ["mom_12m1m", "vol_6m", "beta_12m", "mom_3m1m"])
         d["Momentum"], d["Low Vol"], d["Low Beta"], d["3m Momentum"] = z["mom_12m1m"], -z["vol_6m"], -z["beta_12m"], z["mom_3m1m"]
         d["Multi-Factor"] = (d["Momentum"] + d["Low Vol"]) / 2
+        factores = ["Multi-Factor", "Momentum", "3m Momentum", "Low Vol", "Low Beta"]
+        if C.VERSION != "v2":
+            # Los factores del paper (pág. 11); su multifactor combina valor, momentum y calidad.
+            zf = _z(d, ["valor", "calidad", "crecimiento"])
+            d["Value"], d["Quality"], d["Growth"] = zf["valor"], zf["calidad"], zf["crecimiento"]
+            d["Multi-Factor"] = (d["Value"] + d["Momentum"] + d["Quality"]) / 3
+            factores = ["Multi-Factor", "Value", "Momentum", "Quality", "Low Vol", "Growth"]
         d["ml_pct"] = d.groupby("date")["score"].rank(pct=True)
         filas, curvas = [], {}
-        for fac in ["Multi-Factor", "Momentum", "3m Momentum", "Low Vol", "Low Beta"]:
+        for fac in factores:
             d["w"] = pesos(d, fac)
             d["wf"] = self._filtrar(d)
             res = {}
@@ -375,10 +399,51 @@ class Replica:
         self.res["beta_total"] = round(float(np.cov(ml["ret_neto"], spy)[0, 1] / spy.var()), 3)
         self.res["corr_spy"] = round(float(ml["ret_neto"].corr(spy)), 3)
 
+    # -- 11. atribución frente a factores académicos (Fama-French 5 + momentum; QMJ de AQR mensual) ------
+    def atribucion_academica(self) -> None:
+        import statsmodels.api as sm
+        from linea1a import config as C1
+
+        C1.usar_repo_ml4t()
+        from data import load_aqr_factors, load_ff_factors
+
+        ff = load_ff_factors("ff5", "daily").to_pandas().set_index("timestamp")
+        ff = ff.join(load_ff_factors("mom", "daily").to_pandas().set_index("timestamp"))
+        ff.index = pd.to_datetime(ff.index)
+        cols = ["Mkt-RF", "SMB", "HML", "RMW", "CMA", "MOM"]
+        acum = np.log1p(ff[cols]).cumsum()
+        filas = []
+        for s in ("score", "rev"):
+            b = self.bt[(s, 1)]
+            ini = acum.reindex(b["inicio"], method="ffill").to_numpy()
+            fin = acum.reindex(b["fin"], method="ffill").to_numpy()
+            X = pd.DataFrame(np.expm1(fin - ini), index=b.index, columns=cols)
+            m = sm.OLS(b["ret_neto"], sm.add_constant(X)).fit(cov_type="HAC", cov_kwds={"maxlags": 4})
+            filas.append(self._fila_reg(m, s, "semanal FF5+MOM", C.SEMANAS_ANIO))
+            # Mensual con QMJ (AQR sólo publica QMJ mensual en los datos de Jansen).
+            qmj = load_aqr_factors("qmj").to_pandas().set_index("timestamp")["USA"]
+            qmj.index = pd.to_datetime(qmj.index).to_period("M")
+            mens = (1 + b.set_index("fin")["ret_neto"]).groupby(pd.to_datetime(b["fin"]).dt.to_period("M").to_numpy()).prod() - 1
+            ffm = (1 + ff[cols]).groupby(ff.index.to_period("M")).prod() - 1
+            Xm = ffm.join(qmj.rename("QMJ")).reindex(mens.index)
+            mm = sm.OLS(mens, sm.add_constant(Xm), missing="drop").fit(cov_type="HAC", cov_kwds={"maxlags": 3})
+            filas.append(self._fila_reg(mm, s, "mensual FF5+MOM+QMJ", C.MESES_ANIO))
+        t = pd.DataFrame(filas)
+        t.to_csv(C.RESULTADOS / "11_atribucion_academica.csv", index=False, float_format="%.4f")
+        self.res["atribucion_academica"] = t.round(3).to_dict("records")
+
+    @staticmethod
+    def _fila_reg(m, s: str, modelo: str, periodos: int) -> dict:
+        fila = {"estrategia": {"score": "ML semanal", "rev": "Reversión 1 semana"}[s], "modelo": modelo,
+                "alfa_anual": m.params["const"] * periodos, "t_alfa": m.tvalues["const"], "r2": m.rsquared, "n": int(m.nobs)}
+        for k in m.params.index.drop("const"):
+            fila[f"b_{k}"], fila[f"t_{k}"] = m.params[k], m.tvalues[k]
+        return fila
+
     def todo(self) -> dict:
         for paso in (self.principal, self.regimenes, self.shap, self.exposiciones_y_atribucion,
                      self.estacionalidad_y_lags, self.liquidez, self.dispersion, self.ciclo_momentum,
-                     self.filtro_factores, self.beta_movil):
+                     self.filtro_factores, self.beta_movil, self.atribucion_academica):
             print(f"  {paso.__name__}")
             paso()
         with open(C.RESULTADOS / "resumen.json", "w", encoding="utf-8") as f:

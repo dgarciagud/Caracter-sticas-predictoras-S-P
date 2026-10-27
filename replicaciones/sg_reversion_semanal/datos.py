@@ -39,7 +39,8 @@ def cargar() -> dict[str, pd.DataFrame]:
     b["hi"] = b["high"] * b["adj_factor"]
     b["lo"] = b["low"] * b["adj_factor"]
     b["dv"] = b["close"] * b["volume"]
-    out = {k: _ancho(b, k) for k in ("px", "hi", "lo", "dv")}
+    b["cierre"] = b["close"]  # sin ajustar, para la capitalización (v3)
+    out = {k: _ancho(b, k) for k in ("px", "hi", "lo", "dv", "cierre")}
 
     e = load_etfs(symbols=ETFS_REPLICA, start_date=C.INICIO_ETF).to_pandas().rename(columns={"timestamp": "date"})
     out["etf"] = _ancho(e, "close").reindex(columns=ETFS_REPLICA)

@@ -10,6 +10,16 @@ señal con el lag de ejecución y el ciclo reversión–momentum por periodo de 
 probable es la ausencia de los fundamentales (revisiones de BPA, crecimiento, dividendo), que según el propio
 paper condicionan qué caídas revierten, y la muestra mucho más corta (1-4 años de entrenamiento frente a 10).
 
+**v3** ([`resultados/v3/INFORME_v3.md`](resultados/v3/INFORME_v3.md)). Añade dividendos, fundamentales XBRL de
+la SEC (point-in-time) y dos sustitutos de las revisiones de BPA (SUE y retorno en torno a los resultados).
+- El IC del modelo se duplica, de 0,0065 a 0,0116.
+- El L/S invertible pasa a +1,1 % bruto y −6,2 % neto.
+- El filtro de ejecución mejora las seis carteras factoriales, como en el paper.
+
+Sigue sin batir a la reversión simple. Las revisiones de analistas reales siguen sin poder replicarse.
+
+Este informe describe la **v2** (sólo precio y volumen). Se reproduce con `SG_VERSION=v2`.
+
 ## 1. Qué hace el paper
 
 - Modelo ML (marco de SG de 2017) que predice el retorno de cada acción a 1 semana con ~decenas de factores,
@@ -173,5 +183,6 @@ Para una réplica completa harían falta precios 2006-2026 de EE. UU. y Europa c
 
 ```bash
 bash scripts/00_descargar_datos.sh        # el paso de COT puede fallar (cot_reports no compila en Python 3.13); esta réplica no lo usa
-python -m replicaciones.sg_reversion_semanal.run   # ~2 min con 4 núcleos; caché en replicaciones/sg_reversion_semanal/cache/
+SG_VERSION=v2 python -m replicaciones.sg_reversion_semanal.run   # v2: ~2 min con 4 núcleos; caché en replicaciones/sg_reversion_semanal/cache/
+python -m replicaciones.sg_reversion_semanal.run                # v3 (ver resultados/v3/INFORME_v3.md)
 ```
