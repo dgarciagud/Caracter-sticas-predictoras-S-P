@@ -25,6 +25,8 @@ reapertura del pre-registro tras ver la v1) y
 
 Línea 1B: [`resultados/1B/INFORME_1B.md`](resultados/1B/INFORME_1B.md) (la regla primaria no pasa la puerta de 8.2; 1B se detiene).
 
+Réplica externa: [`replicaciones/sg_reversion_semanal/INFORME.md`](replicaciones/sg_reversion_semanal/INFORME.md) (SG, reversión semanal con ML, 13-05-2026; no se replica con precios del S&P 500 2017-2021; no escribe en `trials.jsonl`).
+
 Prueba de potencia de la etapa 1 (datos sintéticos): [`resultados/potencia/INFORME_POTENCIA.md`](resultados/potencia/INFORME_POTENCIA.md).
 
 Para ejecutar una versión distinta de la v1: `export LINEA1A_PREREG=preregistro/preregistro_1A_v2_mediana.yaml`.

@@ -1,0 +1,232 @@
+{
+  "principal": [
+    {
+      "estrategia": "ML semanal",
+      "lag": 0,
+      "coste_pb": 0.0,
+      "rotacion_media": 1.7056,
+      "ret_anual": 0.0062,
+      "vol_anual": 0.1138,
+      "sharpe": 0.0543,
+      "max_dd": -0.1828,
+      "acierto": 0.522,
+      "n": 205
+    },
+    {
+      "estrategia": "ML semanal",
+      "lag": 0,
+      "coste_pb": 10.0,
+      "rotacion_media": 1.7056,
+      "ret_anual": -0.0825,
+      "vol_anual": 0.1138,
+      "sharpe": -0.7252,
+      "max_dd": -0.3312,
+      "acierto": 0.4488,
+      "n": 205
+    },
+    {
+      "estrategia": "ML semanal",
+      "lag": 1,
+      "coste_pb": 0.0,
+      "rotacion_media": 1.7056,
+      "ret_anual": -0.0116,
+      "vol_anual": 0.1071,
+      "sharpe": -0.1079,
+      "max_dd": -0.1911,
+      "acierto": 0.5073,
+      "n": 205
+    },
+    {
+      "estrategia": "ML semanal",
+      "lag": 1,
+      "coste_pb": 10.0,
+      "rotacion_media": 1.7056,
+      "ret_anual": -0.1002,
+      "vol_anual": 0.1069,
+      "sharpe": -0.9377,
+      "max_dd": -0.3759,
+      "acierto": 0.4049,
+      "n": 205
+    },
+    {
+      "estrategia": "Reversión 1 semana",
+      "lag": 0,
+      "coste_pb": 0.0,
+      "rotacion_media": 3.0961,
+      "ret_anual": 0.1437,
+      "vol_anual": 0.2144,
+      "sharpe": 0.6703,
+      "max_dd": -0.2894,
+      "acierto": 0.5268,
+      "n": 205
+    },
+    {
+      "estrategia": "Reversión 1 semana",
+      "lag": 0,
+      "coste_pb": 10.0,
+      "rotacion_media": 3.0961,
+      "ret_anual": -0.0173,
+      "vol_anual": 0.2143,
+      "sharpe": -0.0808,
+      "max_dd": -0.4292,
+      "acierto": 0.3951,
+      "n": 205
+    },
+    {
+      "estrategia": "Reversión 1 semana",
+      "lag": 1,
+      "coste_pb": 0.0,
+      "rotacion_media": 3.0961,
+      "ret_anual": 0.1285,
+      "vol_anual": 0.1771,
+      "sharpe": 0.7257,
+      "max_dd": -0.2071,
+      "acierto": 0.5268,
+      "n": 205
+    },
+    {
+      "estrategia": "Reversión 1 semana",
+      "lag": 1,
+      "coste_pb": 10.0,
+      "rotacion_media": 3.0961,
+      "ret_anual": -0.0325,
+      "vol_anual": 0.1769,
+      "sharpe": -0.1838,
+      "max_dd": -0.3769,
+      "acierto": 0.4488,
+      "n": 205
+    }
+  ],
+  "por_vix": {
+    "Lowest": -0.1263,
+    "Low": -0.0212,
+    "Middle": -0.1053,
+    "High": -0.2722,
+    "Highest": 0.0238
+  },
+  "por_decil_spy": {
+    "1": -0.0983,
+    "2": 0.0542,
+    "3": -0.061,
+    "4": 0.0316,
+    "5": 0.1071,
+    "6": -0.0779,
+    "7": -0.239,
+    "8": -0.2895,
+    "9": -0.1861,
+    "10": -0.2396
+  },
+  "shap_orden": [
+    "3m1m Price Mom",
+    "Size proxy (log 6m ADV)",
+    "Low Vol (6-month volatility)",
+    "12m1m Res Mom",
+    "1-week return vs sector",
+    "12-month Beta",
+    "1-month high-low range",
+    "Distance to 52-week high",
+    "1m Price Reversals (1-month return)",
+    "Low Residual Vol"
+  ],
+  "shap_signo": {
+    "1-week return vs sector": -0.95,
+    "1m Price Reversals (1-month return)": -0.57,
+    "3m1m Price Mom": 0.74,
+    "12m1m Res Mom": 0.44,
+    "12-month Beta": 0.85,
+    "Low Vol (6-month volatility)": -0.61,
+    "Low Residual Vol": -0.35,
+    "1-month high-low range": -0.89,
+    "Size proxy (log 6m ADV)": 0.34,
+    "Distance to 52-week high": 0.28
+  },
+  "exposicion_media": {
+    "1-week Return (reversal)": 0.697,
+    "12-month Price Momentum": 0.756,
+    "3-month Price Momentum": 0.73,
+    "Low Vol": 0.494,
+    "Low Beta": 0.03,
+    "Low Size (ADV)": -0.446
+  },
+  "atribucion_anual": {
+    "12-month Price Momentum": -0.0177,
+    "Residual": -0.0142,
+    "3-month Price Momentum": -0.007,
+    "Low Beta": -0.0018,
+    "Sectors": -0.0002,
+    "Low Vol": 0.0027,
+    "Low Size (ADV)": 0.0054,
+    "1-week Return (reversal)": 0.0212
+  },
+  "estacionalidad_lags": {
+    "patas_reversion|Larga vs mercado": 0.0741,
+    "patas_reversion|Mercado vs corta": 0.0696,
+    "dia_reversion|Lunes": 0.0503,
+    "dia_reversion|Martes": 0.0573,
+    "dia_reversion|Miércoles": 0.1437,
+    "dia_reversion|Jueves": 0.1518,
+    "dia_reversion|Viernes": 0.0931,
+    "dia_ml|Lunes": -0.0388,
+    "dia_ml|Martes": -0.0227,
+    "dia_ml|Miércoles": 0.0062,
+    "dia_ml|Jueves": 0.0021,
+    "dia_ml|Viernes": -0.0312,
+    "lags_ml_miercoles|lag 0": 0.0062,
+    "lags_ml_miercoles|lag 1": -0.0116,
+    "lags_ml_miercoles|lag 2": -0.0216,
+    "lags_ml_miercoles|lag 3": -0.0109,
+    "lags_ml_miercoles|lag 4": -0.0169
+  },
+  "por_quintil_adv": {
+    "completo": {
+      "Top": -0.0229,
+      "2": -0.1774,
+      "3": -0.238,
+      "4": -0.1245,
+      "Bottom": -0.1208
+    },
+    "ultimo_anio": {
+      "Top": 0.108,
+      "2": -0.1118,
+      "3": -0.1845,
+      "4": -0.1879,
+      "Bottom": -0.1232
+    }
+  },
+  "ml_por_dispersion": {
+    "Baja": -0.215,
+    "Media": -0.0613,
+    "Alta": -0.0227
+  },
+  "ciclo_momentum": {
+    "1": -0.2274,
+    "1-2": 0.0306,
+    "2-3": -0.0447,
+    "3-4": -0.1721,
+    "4-6": -0.0681,
+    "6-8": -0.0391,
+    "8-10": -0.1609,
+    "10-12": -0.0637,
+    "12-18": 0.0232,
+    "18-24": 0.0394,
+    "24-48": -0.0364
+  },
+  "filtro_ml": {
+    "Con filtro ML": {
+      "3m Momentum": -0.0278,
+      "Low Beta": -0.0544,
+      "Low Vol": -0.0549,
+      "Momentum": -0.0556,
+      "Multi-Factor": -0.0443
+    },
+    "Sin filtro": {
+      "3m Momentum": -0.0226,
+      "Low Beta": -0.0547,
+      "Low Vol": -0.0585,
+      "Momentum": -0.0614,
+      "Multi-Factor": -0.0423
+    }
+  },
+  "beta_total": 0.013,
+  "corr_spy": 0.024
+}
