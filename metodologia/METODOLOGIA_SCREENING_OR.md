@@ -97,3 +97,20 @@ la v5 de la 1A, que en las mismas condiciones dio 97 % con R² 1 % y 0/30 falsos
 
 Pre-registro antes de mirar datos, sombras circulares como nula, separación descubrimiento / validación / holdout,
 evaluación fuera de muestra (R² OOS, Clark-West, económicas, DSR, PBO) y criterios de apertura del holdout.
+
+## 8. Resultado de la verificación (2026-10-29)
+
+Detalle en `resultados/screening_prueba/INFORME.md`. p\* = 85 (2,5 % de falsos positivos). Potencia del procedimiento
+completo: F01 lineal 25 % (R² 0,5 %), **68 % (R² 1 %)**, 100 % (R² 2 %); F05 condicional 45 %; F06 con deriva 8 %.
+
+**No cumple el criterio de adopción** (68 % < 70 %) y es menos potente que la 1A v5 (97 % con R² 1 %). Además:
+
+- C2 (interacción) apenas tiene potencia (3-10 %); C3 no rescata las señales con deriva (8 %).
+- El umbral del SFI puede quedar por debajo de 0: hay que exigir también SFI > 0.
+
+Uso recomendado: el **principio** (filtro laxo, decisión fuera de muestra y error calibrado al final) se mantiene, pero
+la implementación por defecto sigue siendo la de la 1A v5. Una versión 0.2 debería (a) exigir SFI > 0, (b) prescindir
+de C2 o sustituirlo por el SFI con estados, (c) usar más réplicas en la fase 2, y volver a pasar esta verificación.
+
+Evaluación de sensibilidad sobre la 1A v5 (`resultados/sensibilidad_screening/INFORME.md`): selecciona el cluster
+{F01, F02, F05} (representante F01) y nada más; el catálogo de la 1A no cambia.

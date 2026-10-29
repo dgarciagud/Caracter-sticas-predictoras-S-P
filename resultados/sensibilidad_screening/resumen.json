@@ -1,0 +1,13 @@
+{
+  "p_screen": 80.0,
+  "p_estrella": 85.0,
+  "pasan_fase1": [
+    "F01",
+    "F05",
+    "F06"
+  ],
+  "seleccionadas": [
+    "F01"
+  ],
+  "nota": "evaluaci\u00f3n de sensibilidad; no modifica el cat\u00e1logo de la 1A v5"
+}

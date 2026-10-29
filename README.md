@@ -25,6 +25,8 @@ reapertura del pre-registro tras ver la v1) y
 
 Línea 1B: [`resultados/1B/INFORME_1B.md`](resultados/1B/INFORME_1B.md) (la regla primaria no pasa la puerta de 8.2; 1B se detiene).
 
+Metodología alternativa (screening OR + SFI/MDA): [`metodologia/METODOLOGIA_SCREENING_OR.md`](metodologia/METODOLOGIA_SCREENING_OR.md), prueba sintética en [`resultados/screening_prueba/INFORME.md`](resultados/screening_prueba/INFORME.md) y sensibilidad sobre la 1A en [`resultados/sensibilidad_screening/INFORME.md`](resultados/sensibilidad_screening/INFORME.md).
+
 Prueba de potencia de la etapa 1 (datos sintéticos): [`resultados/potencia/INFORME_POTENCIA.md`](resultados/potencia/INFORME_POTENCIA.md).
 
 Para ejecutar una versión distinta de la v1: `export LINEA1A_PREREG=preregistro/preregistro_1A_v2_mediana.yaml`.
