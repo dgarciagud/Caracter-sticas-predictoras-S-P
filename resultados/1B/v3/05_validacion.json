@@ -1,0 +1,32 @@
+{
+  "eventos_validacion": 53,
+  "ret_neto_medio_primario": 0.004273346649651862,
+  "t_nw_primario": 1.1836543164323314,
+  "acierto_primario": 0.5094339622641509,
+  "meta_features": [],
+  "nula_filtros": {
+    "filtrado_logistica": {
+      "p95": 0.7129062465146218,
+      "p_valor": 0.935
+    },
+    "filtrado_ebm": {
+      "p95": 0.7135900936183835,
+      "p_valor": 0.929
+    }
+  },
+  "dsr": {
+    "dsr": 0.8521914485090251,
+    "sharpe_lider_anual": 0.23041981381207624,
+    "n_ensayos": 41,
+    "lider": "primario"
+  },
+  "pbo": {
+    "pbo": 0.5578865578865578,
+    "n_combinaciones": 12870,
+    "n_estrategias": 2
+  },
+  "estrategias_distintas": [
+    "primario",
+    "filtrado_logistica"
+  ]
+}
