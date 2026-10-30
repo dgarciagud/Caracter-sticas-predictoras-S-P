@@ -1,0 +1,55 @@
+# Pre-registro de la línea 1B, versión 3: regla primaria LAXA de reversión para meta-labeling
+# Fechado el 2026-10-30, antes de construir sus eventos o etiquetas. Ensayo distinto de la 1B-v1 y la 1B-v2 (8.2).
+# Planteamiento explícito: no es una regla de reversión con ventaja propia, sino una regla laxa que genera muchas
+# oportunidades (~26 % de las semanas) para que el meta-label decida cuáles tomar. El umbral (-0,5 sigma) se fija por
+# frecuencia (~13,5 eventos/año, ~60 por fold de test, calculada solo con la señal, sin retornos posteriores), no por
+# rentabilidad. La puerta de 8.2 se INFORMA pero no es requisito; el éxito se juzga por si el filtro crea ventaja neta.
+fecha: "2026-10-30"
+version: "1B-v3"
+especificacion: "Líneas 1A y 1B · Especificación S&P 500 a 5 días, sección 8 (con la puerta 8.2 sustituida, ver arriba)"
+catalogo_1A: "preregistro_1A_v5.yaml: F05 estable condicional (R_trend = 1), F14 redundante"
+
+muestra:   # mismos periodos que la 1A v5 y la 1B-v1/v2
+  inicio_carga: "1988-01-01"
+  descubrimiento: ["1993-01-01", "2018-12-31"]
+  ventana_test: ["1997-01-01", "2018-12-31"]
+  validacion: ["2019-01-01", "2022-12-31"]
+  holdout: ["2023-01-01", "2025-12-31"]        # sellado
+  decision: "cierre del último día hábil de cada semana ISO"
+
+volatilidad: "la misma capa HAR-RV con VIX de la 1B-v1 (resultados/1B/01_volatilidad_qlike.csv)"
+
+regla_primaria:
+  definicion: "comprar al cierre de la semana t si log(P_t/P_{t-5}) < -0,5 * sigma5_{t-5} (sigma5 HAR prevista al cierre de la semana anterior, antes de la caída)"
+  barreras: {toma_beneficio: "+1,0 * sigma5_t desde la entrada", stop: "-1,0 * sigma5_t desde la entrada", vertical: "5 sesiones"}
+  ejecucion_barreras: "como en la 1B-v1: máximos y mínimos diarios; salida a la barrera salvo hueco de apertura; stop primero si toca las dos el mismo día"
+  costes: "2 pb por lado (4 pb ida y vuelta)"
+  puerta_8_2: "se informa (media neta y t NW en descubrimiento) pero NO detiene la línea"
+
+meta_label:
+  definicion: "1 si toca primero la toma de beneficio, o llega a la vertical con retorno neto > 0; 0 en otro caso"
+  pesos: "unicidad × |ret_neto|, normalizados a sumar el número de eventos"
+
+anexo_meta_label:
+  meta_features_efectivas: [F05, R_vol, R_trend]   # F14 se deja fuera
+  signos: {F05: 1, R_vol: 0, R_trend: 1}           # F05: más miedo reciente -> más acierto; R_trend: mejor en mercado alcista (1A v5)
+  folds: "5 bloques de test de igual duración en 1997-2018 sobre los eventos; entrenamiento expansivo desde 1993; purga y embargo de 5 sesiones"
+  etapa1: "U = media de folds de signo*(AUC - 0,5) (|AUC - 0,5| sin signo); 1.000 sombras desplazadas en el calendario semanal"
+  etapa2_logistica: "LogisticRegression L2, C por validación interna (TimeSeriesSplit 3), congelado para las 100 réplicas"
+  etapa2_ebm: "ExplainableBoostingClassifier(interactions=0, min_samples_leaf=20, outer_bags=4); G1 y G3, media de folds"
+  clasificacion: "entra al meta-modelo si pasa la etapa 1, cumple en la logística y en el EBM y ambos coinciden en signo"
+  umbral: "un único percentil p para todos los umbrales; p* = el más bajo de la rejilla 95..50 con <= 5 % de nulas (meta-labels reales desplazados sobre la secuencia de eventos, 100 corridas) con alguna feature en el meta-modelo"
+  calibracion_probabilidad: "Platt (sigmoid, cv=3) dentro del entrenamiento"
+  objetivo_volatilidad: "mediana de sigma5_t de los eventos de descubrimiento; riesgo base = objetivo / sigma5_t"
+  decision: "operar si p > 0,55; tamaño = min(2p - 1, 1) × riesgo base"
+
+potencia:   # antes de la selección real; con meta-labels SINTÉTICOS sobre las fechas y features reales de los eventos
+  efectos: ["ninguno", "F05 con AUC 0,55 / 0,60 / 0,65", "R_trend con +10 puntos de acierto en mercado alcista"]
+  replicas: 40
+  uso: "informativa: se publica la potencia con p* antes de la selección real; no cambia la configuración"
+
+exito:   # en validación 2019-2022
+  - "Sharpe neto del primario filtrado > Sharpe neto del primario solo"
+  - "Sharpe neto del filtrado > p95 de 1.000 filtros aleatorios con el mismo número de eventos por año"
+  - "DSR > 0,95 con todos los ensayos de 1A y 1B"
+  nota: "si no hay meta-features, el filtro es la tasa base y la línea se documenta como nula"
