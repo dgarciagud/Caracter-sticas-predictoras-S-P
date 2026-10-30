@@ -208,7 +208,7 @@ def _sharpe(x) -> float:
     return float(x.mean() / x.std(ddof=1) * np.sqrt(52)) if x.std() > 0 else np.nan
 
 
-def paso_validacion(_):
+def paso_validacion(a):
     import joblib
     from sklearn.metrics import brier_score_loss, roc_auc_score
 
@@ -216,12 +216,19 @@ def paso_validacion(_):
 
     E = _eventos_desc()
     sel = joblib.load(SEL_CACHE)
+    # Ensayo exploratorio: meta-modelo con todas las meta-features, sin pasar por la selección (no confirmatorio).
+    explor = getattr(a, "paso", "") == "exploratorio"
+    if explor:
+        from linea1b import meta as M
+
+        sel = dict(sel, meta_features=list(M.FEATURES))
+    pref = "07_exploratorio" if explor else "05"
     d = volatilidad.cargar_diario()
     v = pd.read_parquet(VOL)
     panel = pd.read_parquet(C.CACHE / "panel_1988.parquet")
     ev_val, pred, tam, pnl = _validar(E, sel["meta_features"], d, v, panel)
-    ev_val.assign(p_logistica=pred["logistica"], p_ebm=pred["ebm"]).to_csv(R / "05_eventos_validacion.csv")
-    pnl.to_csv(R / "05_pnl_semanal_validacion.csv")
+    ev_val.assign(p_logistica=pred["logistica"], p_ebm=pred["ebm"]).to_csv(R / f"{pref}_eventos_validacion.csv")
+    pnl.to_csv(R / f"{pref}_pnl_semanal_validacion.csv")
     y = ev_val.meta_label.to_numpy()
     media, t = media_nw(ev_val.ret_neto.to_numpy())
     filas = []
@@ -254,8 +261,12 @@ def paso_validacion(_):
             sh.append(_sharpe(p_r))
         nula[c] = dict(p95=float(np.nanpercentile(sh, 95)), p_valor=float((np.array(sh) >= _sharpe(pnl[c])).mean()))
     for c in pnl:
-        registro.registrar(periodo="validacion", modelo=f"1B_{c}", variables=sel["meta_features"],
-                           hiperparametros=dict(umbral_p=0.55), metricas=tabla.set_index("estrategia").loc[c].to_dict())
+        if explor and c == "primario":
+            continue  # el primario solo ya está registrado en la validación confirmatoria
+        registro.registrar(periodo="validacion", modelo=f"1B_{c}" + ("_exploratorio" if explor else ""),
+                           variables=sel["meta_features"], hiperparametros=dict(umbral_p=0.55),
+                           metricas=tabla.set_index("estrategia").loc[c].to_dict(),
+                           **(dict(nota="exploratorio: todas las meta-features sin selección; no confirmatorio") if explor else {}))
     from linea1a import registro as R1A
 
     n_ensayos = len(R1A.leer("1A")) + len(R1A.leer("1B"))
@@ -266,8 +277,8 @@ def paso_validacion(_):
                nula_filtros=nula, dsr=dsr(exceso, n_ensayos),
                pbo=cscv_pbo(distintas, S=16) if distintas.shape[1] >= 2 else None,
                estrategias_distintas=list(distintas.columns))
-    tabla.to_csv(R / "05_validacion.csv", index=False)
-    json.dump(res, open(R / "05_validacion.json", "w"), indent=2, default=float)
+    tabla.to_csv(R / f"{pref}_validacion.csv", index=False)
+    json.dump(res, open(R / f"{pref}_validacion.json", "w"), indent=2, default=float)
     print(tabla.round(4).to_string(index=False))
     print(json.dumps(res, indent=2, default=float))
 
@@ -288,10 +299,10 @@ def paso_nula(a):
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
-    ap.add_argument("paso", choices=["volatilidad", "regla", "calibrar", "seleccion", "validacion", "nula"])
+    ap.add_argument("paso", choices=["volatilidad", "regla", "calibrar", "seleccion", "validacion", "exploratorio", "nula"])
     ap.add_argument("--runs", type=int, default=100)
     ap.add_argument("--r1", type=int, default=1000)
     ap.add_argument("--r2", type=int, default=20)
     a = ap.parse_args()
     dict(volatilidad=paso_volatilidad, regla=paso_regla, calibrar=paso_calibrar, seleccion=paso_seleccion,
-         validacion=paso_validacion, nula=paso_nula)[a.paso](a)
+         validacion=paso_validacion, exploratorio=paso_validacion, nula=paso_nula)[a.paso](a)

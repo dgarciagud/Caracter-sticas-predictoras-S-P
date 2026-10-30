@@ -78,3 +78,23 @@ y ni F05 ni los regímenes añaden un filtro detectable: F05 tiene el signo cont
 esperada, queda en el rango de efectos (~+10 pp) que esta muestra no puede distinguir del ruido. No se ejecuta la nula
 del procedimiento: sin meta-features seleccionadas no hay nada que contrastar más allá de la calibración (sección 2).
 Holdout sin abrir.
+
+## 7. Ensayo exploratorio: meta-modelo con F05, R_vol y R_trend sin selección (no confirmatorio)
+
+Pedido después de ver la sección 4. Mismo protocolo de validación (reentrenamiento anual, Platt, operar si p > 0,55,
+tamaño min(2p − 1, 1) × riesgo base), pero forzando las tres meta-features. Registrado en `trials.jsonl` como
+exploratorio (2 ensayos más; cuentan para el DSR y el PBO). No cambia la conclusión de la sección 6.
+Código: `python scripts/run_linea_1b.py exploratorio`; salidas `07_exploratorio_*`.
+
+| Estrategia | Operaciones | Sharpe neto | Rent. anual | AUC | Acierto si opera | p-valor nula filtros (p95) |
+| --- | --- | --- | --- | --- | --- | --- |
+| Primario solo | 53 | 0,23 | 1,6 % | — | 51 % | — |
+| Filtrado logística | 41 | −0,16 | −0,1 % | 0,37 | 46 % (descartados: 67 %) | 0,90 (0,71) |
+| Filtrado EBM | 28 | 0,35 | 0,3 % | 0,49 | 54 % (descartados: 48 %) | 0,37 (0,78) |
+
+DSR del líder (EBM) con 43 ensayos = 0,14; PBO = 0,14.
+
+En validación los regímenes van al revés que en descubrimiento: acierto 54 % fuera de tendencia frente a 48 % en
+tendencia alcista; y el tercil alto de F05 sigue siendo el peor (44 %, −0,33 %). La logística, que aprende sobre todo
+R_trend, descarta precisamente los eventos buenos (AUC 0,37). El EBM mejora algo el Sharpe sobre el primario, pero con
+un AUC de 0,49 y lejos del p95 de los filtros aleatorios: es azar en la elección de 28 operaciones, no un filtro.
