@@ -82,6 +82,7 @@ def paso_regla(_):
     )
     if C.REGLA == "reversion_laxa":
         sem = regla.fechas_decision(d.loc[C.DESC_INI : C.DESC_FIN].index)
+        res["stops_tocando_ambas"] = int(ev["toca_ambas"].sum())
         res["fraccion_semanas_con_evento"] = float(len(ev) / len(sem))
         from linea1b import meta as M
 

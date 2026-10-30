@@ -52,11 +52,11 @@ def eventos(d: pd.DataFrame, sigma5: pd.Series, ini, fin, senal: pd.Series) -> p
             continue
         p0 = d["close"].iloc[i]
         tp, sl = p0 * np.exp(C.BARRERA * s), p0 * np.exp(-C.BARRERA * s)
-        salida, motivo, k_sal = d["close"].iloc[i + C.H], "vertical", C.H
+        salida, motivo, k_sal, ambas = d["close"].iloc[i + C.H], "vertical", C.H, False
         for k in range(1, C.H + 1):
             o, h, lo = d["open"].iloc[i + k], d["high"].iloc[i + k], d["low"].iloc[i + k]
             if lo <= sl:  # stop primero si el mismo día toca las dos (supuesto conservador)
-                salida, motivo, k_sal = (o if o < sl else sl), "stop", k
+                salida, motivo, k_sal, ambas = (o if o < sl else sl), "stop", k, bool(h >= tp)
                 break
             if h >= tp:
                 salida, motivo, k_sal = (o if o > tp else tp), "toma_beneficio", k
@@ -70,6 +70,7 @@ def eventos(d: pd.DataFrame, sigma5: pd.Series, ini, fin, senal: pd.Series) -> p
                 entrada=p0,
                 salida=salida,
                 motivo=motivo,
+                toca_ambas=ambas,
                 sesiones=k_sal,
                 fin=d.index[i + k_sal],
                 ret_neto=ret,

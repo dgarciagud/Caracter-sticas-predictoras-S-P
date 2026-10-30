@@ -37,7 +37,7 @@ HOLDOUT_INI = pd.Timestamp(_m["holdout"][0])
 
 H = 5
 UMBRAL_REGLA = 0.5 if REGLA == "reversion_laxa" else 1.5
-BARRERA = 1.0
+BARRERA = 0.5 if VERSION == "1B-v4" else 1.0
 COSTE_IDA_VUELTA = 4e-4
 T_MIN_REGLA = 1.5
 INICIO_HAR = pd.Timestamp("1990-01-01")
