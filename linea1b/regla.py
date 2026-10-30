@@ -22,6 +22,12 @@ def senal_reversion(d: pd.DataFrame, sigma5: pd.Series) -> pd.Series:
     return (lp - lp.shift(C.H)) < -C.UMBRAL_REGLA * sigma5
 
 
+def senal_reversion_laxa(d: pd.DataFrame, sigma5: pd.Series) -> pd.Series:
+    """1B-v3: retorno a 5 días por debajo de -0,5 sigma5 prevista al cierre de la semana anterior (t-5), antes de la caída."""
+    lp = np.log(d["close"])
+    return (lp - lp.shift(C.H)) < -C.UMBRAL_REGLA * sigma5.shift(C.H)
+
+
 def senal_vix_alcista(panel: pd.DataFrame) -> pd.Series:
     """1B-v2: F05 por encima de su percentil 80 de las 156 semanas anteriores y R_trend = 1 (panel semanal de la 1A)."""
     f05 = panel["F05"]

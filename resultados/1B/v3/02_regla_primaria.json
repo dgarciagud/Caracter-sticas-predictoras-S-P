@@ -1,0 +1,27 @@
+{
+  "eventos": 357,
+  "eventos_por_anio": 13.732938388625593,
+  "media_ret_neto": 0.0023028455981709264,
+  "t_nw": 1.9864756163604804,
+  "tasa_acierto_meta_label": 0.5938375350140056,
+  "salidas": {
+    "toma_beneficio": 133,
+    "vertical": 129,
+    "stop": 95
+  },
+  "ret_medio_por_salida": {
+    "stop": -0.0273019308024668,
+    "toma_beneficio": 0.02431576020870399,
+    "vertical": 0.0014093271087111336
+  },
+  "cumple_requisito": true,
+  "puerta_obligatoria": false,
+  "fraccion_semanas_con_evento": 0.2630803242446573,
+  "eventos_por_fold_test": [
+    72,
+    69,
+    63,
+    52,
+    55
+  ]
+}

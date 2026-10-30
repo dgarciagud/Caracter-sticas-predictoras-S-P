@@ -52,4 +52,4 @@ exito:   # en validación 2019-2022
   - "Sharpe neto del primario filtrado > Sharpe neto del primario solo"
   - "Sharpe neto del filtrado > p95 de 1.000 filtros aleatorios con el mismo número de eventos por año"
   - "DSR > 0,95 con todos los ensayos de 1A y 1B"
-  nota: "si no hay meta-features, el filtro es la tasa base y la línea se documenta como nula"
+  - "nota: si no hay meta-features, el filtro es la tasa base y la línea se documenta como nula"

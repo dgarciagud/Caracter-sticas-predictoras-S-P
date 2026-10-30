@@ -53,14 +53,19 @@ def paso_volatilidad(_):
     print(t.round(4).to_string(index=False))
 
 
+def _senal(d, v, panel=None):
+    if C.REGLA == "reversion":
+        return regla.senal_reversion(d, v["sigma5_har"])
+    if C.REGLA == "reversion_laxa":
+        return regla.senal_reversion_laxa(d, v["sigma5_har"])
+    panel = pd.read_parquet(C.CACHE / "panel_1988.parquet") if panel is None else panel  # panel semanal de la 1A v4/v5
+    return regla.senal_vix_alcista(panel)
+
+
 def paso_regla(_):
     d = volatilidad.cargar_diario()
     v = pd.read_parquet(VOL)
-    if C.REGLA == "reversion":
-        senal = regla.senal_reversion(d, v["sigma5_har"])
-    else:
-        panel = pd.read_parquet(C.CACHE / "panel_1988.parquet")  # panel semanal de la 1A v4/v5 (F05, R_trend)
-        senal = regla.senal_vix_alcista(panel)
+    senal = _senal(d, v)
     ev = regla.eventos(d, v["sigma5_har"], C.DESC_INI, C.DESC_FIN, senal)
     ev.to_csv(R / "02_eventos_descubrimiento.csv")
     media, t = media_nw(ev.ret_neto.to_numpy())
@@ -73,7 +78,14 @@ def paso_regla(_):
         salidas=ev.motivo.value_counts().to_dict(),
         ret_medio_por_salida=ev.groupby("motivo").ret_neto.mean().to_dict(),
         cumple_requisito=bool(media > 0 and t > C.T_MIN_REGLA),
+        puerta_obligatoria=C.PUERTA_OBLIGATORIA,
     )
+    if C.REGLA == "reversion_laxa":
+        sem = regla.fechas_decision(d.loc[C.DESC_INI : C.DESC_FIN].index)
+        res["fraccion_semanas_con_evento"] = float(len(ev) / len(sem))
+        from linea1b import meta as M
+
+        res["eventos_por_fold_test"] = [int(len(te)) for _, te in M.folds(ev)]
     registro.registrar(periodo="descubrimiento", modelo=f"regla_primaria_{C.REGLA}", variables=[],
                        hiperparametros=dict(umbral=C.UMBRAL_REGLA, barrera=C.BARRERA, coste=C.COSTE_IDA_VUELTA),
                        metricas=res)
@@ -81,9 +93,10 @@ def paso_regla(_):
     print(json.dumps(res, indent=2, default=float))
 
 
-# ------------------------------------------------------------------ meta-label (1B-v2)
+# ------------------------------------------------------------------ meta-label (1B-v2 y 1B-v3)
 REJILLA_P = [95.0, 90.0, 85.0, 80.0, 75.0, 70.0, 65.0, 60.0, 50.0]
 SEMILLA = 20261027
+SEL_CACHE = C.CACHE / f"1B_{C.VERSION.split('-')[1]}_seleccion.joblib"
 
 
 def _eventos_desc():
@@ -136,7 +149,7 @@ def paso_seleccion(_):
     E = _eventos_desc()
     p = _p_estrella()
     sel = M.seleccionar(E, p, R1=1000, R2=100, semilla=SEMILLA)
-    joblib.dump(sel, C.CACHE / "1B_v2_seleccion.joblib")
+    joblib.dump(sel, SEL_CACHE)
     e1 = sel["e1"]
     t1 = pd.DataFrame(dict(feature=M.FEATURES, U=e1["U"], umbral=float(np.nanpercentile(e1["M"], p)),
                            p_perm=[float((e1["M"] >= u).mean()) for u in e1["U"]],
@@ -157,7 +170,7 @@ def _validar(E, meta_features, d, v, panel):
     """Predicción anual en 2019-2022 y P&L semanal de las tres estrategias (8.8)."""
     from linea1b import meta as M
 
-    senal = regla.senal_vix_alcista(panel)
+    senal = _senal(d, v, panel)
     ev_val = regla.eventos(d, v["sigma5_har"], C.VAL_INI, C.VAL_FIN, senal)
     Xv = panel.loc[ev_val.index, M.FEATURES].to_numpy(float)
     yv = ev_val.meta_label.to_numpy(int)
@@ -202,7 +215,7 @@ def paso_validacion(_):
     from linea1a.evaluacion import cscv_pbo, dsr
 
     E = _eventos_desc()
-    sel = joblib.load(C.CACHE / "1B_v2_seleccion.joblib")
+    sel = joblib.load(SEL_CACHE)
     d = volatilidad.cargar_diario()
     v = pd.read_parquet(VOL)
     panel = pd.read_parquet(C.CACHE / "panel_1988.parquet")
