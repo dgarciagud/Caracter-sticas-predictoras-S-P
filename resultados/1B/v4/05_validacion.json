@@ -1,0 +1,22 @@
+{
+  "eventos_validacion": 53,
+  "ret_neto_medio_primario": 0.0004159757620530658,
+  "t_nw_primario": 0.1667352458322849,
+  "acierto_primario": 0.5094339622641509,
+  "meta_features": [],
+  "nula_filtros": {
+    "filtrado_logistica": {
+      "p95": NaN,
+      "p_valor": 0.0
+    },
+    "filtrado_ebm": {
+      "p95": NaN,
+      "p_valor": 0.0
+    }
+  },
+  "dsr": null,
+  "pbo": null,
+  "estrategias_distintas": [
+    "primario"
+  ]
+}

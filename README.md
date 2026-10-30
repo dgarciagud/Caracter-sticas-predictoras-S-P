@@ -23,7 +23,7 @@ reapertura del pre-registro tras ver la v1) y
 [`resultados/v4/INFORME_1A_v4.md`](resultados/v4/INFORME_1A_v4.md) (v4, test 1997-2018 y objetivo normalizado; potencia 93 % a R² 2 %) y
 [`resultados/v5/INFORME_1A_v5.md`](resultados/v5/INFORME_1A_v5.md) (v5, umbrales calibrados al 5 % de error total; **F05 estable condicional**, holdout sin abrir).
 
-Línea 1B: [`resultados/1B/INFORME_1B.md`](resultados/1B/INFORME_1B.md) (v1: la regla no pasa la puerta; v2: regla VIX alcista, sin meta-features) y [`resultados/1B/v3/INFORME_1B_v3.md`](resultados/1B/v3/INFORME_1B_v3.md) (v3: reversión laxa −0,5σ con meta-label; regla con t 1,99, ninguna meta-feature; nula).
+Línea 1B: [`resultados/1B/INFORME_1B.md`](resultados/1B/INFORME_1B.md) (v1: la regla no pasa la puerta; v2: regla VIX alcista, sin meta-features) y [`resultados/1B/v3/INFORME_1B_v3.md`](resultados/1B/v3/INFORME_1B_v3.md) (v3: reversión laxa −0,5σ con meta-label; regla con t 1,99, ninguna meta-feature; nula) y [`resultados/1B/v4/INFORME_1B_v4.md`](resultados/1B/v4/INFORME_1B_v4.md) (v4: barreras ±0,5σ; peor: la regla pierde la ventaja; nula).
 
 Metodología alternativa (screening OR + SFI/MDA): [`metodologia/METODOLOGIA_SCREENING_OR.md`](metodologia/METODOLOGIA_SCREENING_OR.md), prueba sintética en [`resultados/screening_prueba/INFORME.md`](resultados/screening_prueba/INFORME.md) y sensibilidad sobre la 1A en [`resultados/sensibilidad_screening/INFORME.md`](resultados/sensibilidad_screening/INFORME.md).
 

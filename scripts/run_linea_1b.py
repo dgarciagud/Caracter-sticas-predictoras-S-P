@@ -271,11 +271,11 @@ def paso_validacion(a):
     from linea1a import registro as R1A
 
     n_ensayos = len(R1A.leer("1A")) + len(R1A.leer("1B"))
-    exceso = {c: pnl[c] for c in pnl}
+    exceso = {c: pnl[c] for c in pnl if pnl[c].std() > 0}  # una estrategia que no opera no entra en DSR ni PBO
     distintas = pd.DataFrame(exceso).loc[:, ~pd.DataFrame(exceso).T.duplicated()]
     res = dict(eventos_validacion=len(ev_val), ret_neto_medio_primario=media, t_nw_primario=t,
                acierto_primario=float(y.mean()), meta_features=sel["meta_features"],
-               nula_filtros=nula, dsr=dsr(exceso, n_ensayos),
+               nula_filtros=nula, dsr=dsr(exceso, n_ensayos) if len(exceso) >= 2 else None,  # con una sola serie no hay deflactor
                pbo=cscv_pbo(distintas, S=16) if distintas.shape[1] >= 2 else None,
                estrategias_distintas=list(distintas.columns))
     tabla.to_csv(R / f"{pref}_validacion.csv", index=False)

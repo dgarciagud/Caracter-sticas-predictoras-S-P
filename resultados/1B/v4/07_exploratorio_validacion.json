@@ -1,0 +1,37 @@
+{
+  "eventos_validacion": 53,
+  "ret_neto_medio_primario": 0.0004159757620530658,
+  "t_nw_primario": 0.1667352458322849,
+  "acierto_primario": 0.5094339622641509,
+  "meta_features": [
+    "F05",
+    "R_vol",
+    "R_trend"
+  ],
+  "nula_filtros": {
+    "filtrado_logistica": {
+      "p95": 0.5135368337579037,
+      "p_valor": 0.812
+    },
+    "filtrado_ebm": {
+      "p95": 0.4586371884078979,
+      "p_valor": 0.967
+    }
+  },
+  "dsr": {
+    "dsr": 7.370761901171349e-07,
+    "sharpe_lider_anual": -0.2534670934093545,
+    "n_ensayos": 50,
+    "lider": "primario"
+  },
+  "pbo": {
+    "pbo": 0.07886557886557886,
+    "n_combinaciones": 12870,
+    "n_estrategias": 3
+  },
+  "estrategias_distintas": [
+    "primario",
+    "filtrado_logistica",
+    "filtrado_ebm"
+  ]
+}
