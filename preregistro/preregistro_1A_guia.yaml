@@ -1,0 +1,168 @@
+# Pre-registro · Línea 1A según la guía del TFM (Guia_TFM_ML_gestion_Inversiones_L1_v26-27_v5.docx)
+# «Características predictivas robustas por estabilidad SHAP» y su anexo (A.1-A.12).
+# Escrito ANTES de calcular ningún estadístico de las variables contra el objetivo. Su SHA-256 va en cada
+# línea del registro de intentos. Cualquier cambio posterior crea una versión nueva y se declara.
+#
+# DECLARACIÓN DE CONTAMINACIÓN. Este repositorio ya contiene otra línea 1A (pre-registros v1-v5,
+# carpeta linea1a/) con descubrimiento 1993-2018 y validación 2019-2022. Por tanto 2013-2022, que la guía
+# reserva como holdout, YA SE HA MIRADO con candidatas parecidas (reversión a 5 días, VRP, dVIX, tendencia,
+# FOMC, cambio de mes). Solo 2023-2026 es virgen para el autor. El holdout se reportará entero (2013-2026)
+# y por separado 2013-2022 (contaminado) y 2023-2026 (virgen). La conclusión de holdout descansará en 2023-2026.
+version: "g1"
+fecha: "2026-11-18"
+autor: "David Garcia; implementación con Claude Code"
+guia: "Guia_TFM_ML_gestion_Inversiones_L1_v26-27_v5.docx (sublínea 1.A y anexo A)"
+semilla: 20261118
+
+datos:
+  indice: "S&P 500 OHLC del repo de Stefan Jansen (data/equities/market/sp500/sp500.csv, 1980-2025); Yahoo ^GSPC solo para 2026 y para el volumen"
+  fred: "VIXCLS (VIX), DFF (tipo libre de riesgo), BAA10Y (crédito), T10Y3M (pendiente), fredgraph.csv (valores actuales; VIX y tipos de mercado no se revisan)"
+  sectores: "Kenneth French, 12 carteras industriales diarias ponderadas por capitalización"
+  fomc: "data_ref/fomc_decision_dates.csv (reuniones programadas, día de decisión)"
+  limitaciones: "sin estructura temporal del VIX (VIX3M empieza en 2006); sin ETFs sectoriales antes de 1998 (se usan las industrias de French)"
+
+muestra:
+  inicio_datos: "1980-01-02"          # historia previa solo para ventanas y calentamiento de los z-scores
+  descubrimiento: ["1990-01-01", "2012-12-31"]   # las observaciones válidas empiezan cuando el VIX tiene 252 sesiones de historia (~1991)
+  holdout: ["2013-01-01", "2026-12-31"]          # sellado en el código (datos.cargar)
+  horizonte_sesiones: 5
+  decision: "diaria al cierre; etiquetas solapadas de 5 sesiones"
+  span_sigma: 60
+  objetivo: "y = (P[t+5]/P[t] - 1 - 5*DFF[t]/100/252) / sigma_5(t); sigma_5 = desviación EWMA(span 60) del log-retorno diario * sqrt(5), conocida en t"
+  pesos: "unicidad media de López de Prado (2018, cap. 4)"
+  frontera: "la última etiqueta de descubrimiento termina como tarde el 2012-12-31 (embargo >= h hasta el holdout)"
+
+estandarizacion:
+  metodo: "winsorización 1/99 con percentiles expansivos y z-score expansivo; mínimo 252 sesiones"
+  minimo_sesiones: 252
+  winsor: 0.01
+  binarias: "las de calendario quedan en 0/1"
+  modelo: "el StandardScaler del ridge se ajusta solo con el entrenamiento de cada partición"
+
+# Signo esperado: +1 / -1 con hipótesis; 0 = sin signo previo (contraste bilateral).
+candidatas:
+  TEN_mom12_1:   {familia: tendencia,   signo: 1,  def: "log P[t-21] - log P[t-252]", mecanismo: "momentum de serie temporal (Moskowitz et al. 2012)"}
+  TEN_sma50_200: {familia: tendencia,   signo: 1,  def: "SMA50/SMA200 - 1", mecanismo: "tendencia"}
+  TEN_mom1m:     {familia: tendencia,   signo: 0,  def: "log P[t] - log P[t-21]", mecanismo: "sin hipótesis: tendencia o reversión de un mes"}
+  REV_r5:        {familia: reversion,   signo: -1, def: "(log P[t] - log P[t-5]) / sigma_5(t)", mecanismo: "provisión de liquidez a corto plazo (Nagel 2012)"}
+  REV_z20:       {familia: reversion,   signo: -1, def: "(P - SMA20) / SD20", mecanismo: "provisión de liquidez"}
+  REV_r1:        {familia: reversion,   signo: -1, def: "r[t] / sigma_d(t)", mecanismo: "reversión diaria"}
+  VOL_rvratio:   {familia: volatilidad, signo: -1, def: "RV5/RV21", mecanismo: "estrés reciente"}
+  VOL_vrp:       {familia: volatilidad, signo: 1,  def: "(VIX/100)^2 - RV21^2", mecanismo: "prima de varianza (Bollerslev, Tauchen y Zhou 2009)"}
+  VOL_dvix5:     {familia: volatilidad, signo: 1,  def: "log VIX[t]/VIX[t-5]", mecanismo: "rebote tras picos de miedo"}
+  VOL_rvterm:    {familia: volatilidad, signo: 0,  def: "log RV21/RV252", mecanismo: "forma temporal de la volatilidad realizada; sin signo previo"}
+  VOL_downshare: {familia: volatilidad, signo: 0,  def: "suma r^2 negativos / suma r^2, 21 sesiones", mecanismo: "asimetría de la volatilidad; sin signo previo"}
+  VOL_rangerv:   {familia: volatilidad, signo: 0,  def: "log(Parkinson21 / RV21)", mecanismo: "volatilidad intradía frente a cierre a cierre; sin signo previo"}
+  CAL_fomc:      {familia: calendario,  signo: 1,  def: "1 si (t, t+5] contiene una decisión FOMC programada", mecanismo: "drift pre-FOMC (Lucca y Moench 2015)"}
+  CAL_tom:       {familia: calendario,  signo: 1,  def: "1 si (t, t+5] contiene la primera sesión de un mes", mecanismo: "cambio de mes (Lakonishok y Smidt 1988)"}
+  CAL_opex:      {familia: calendario,  signo: 0,  def: "1 si (t, t+5] contiene el vencimiento mensual de opciones (tercer viernes)", mecanismo: "sin signo previo"}
+  VOLU_abn:      {familia: volumen,     signo: 0,  def: "log V[t] - media de log V en las 50 sesiones previas", mecanismo: "volumen anómalo; sin signo previo"}
+  VOLU_signed:   {familia: volumen,     signo: 0,  def: "suma 20 sesiones sign(r) V / suma V", mecanismo: "presión compradora; sin signo previo"}
+  SEC_defcyc:    {familia: sectores,    signo: 0,  def: "retorno 21 s. (NoDur, Utils, Hlth) - (Durbl, Manuf, BusEq)", mecanismo: "rotación defensiva; sin signo previo"}
+  SEC_disp:      {familia: sectores,    signo: 0,  def: "dispersión entre industrias del retorno a 21 s.", mecanismo: "sin signo previo"}
+  AMP_ma50:      {familia: amplitud,    signo: 0,  def: "fracción de las 12 industrias sobre su media de 50 sesiones", mecanismo: "amplitud; sin signo previo"}
+  AMP_corr:      {familia: amplitud,    signo: 1,  def: "correlación media entre pares de industrias, 63 sesiones", mecanismo: "riesgo de correlación (Pollet y Wilson 2010)"}
+  CRE_dbaa21:    {familia: credito,     signo: -1, def: "BAA10Y[t] - BAA10Y[t-21]", mecanismo: "endurecimiento del crédito"}
+  TIP_slope:     {familia: tipos,       signo: 1,  def: "T10Y3M", mecanismo: "pendiente de la curva (Campbell 1987)"}
+
+# Variables de régimen del núcleo de A.12 (no son candidatas: entran en M2/M3).
+regimenes:
+  REG_rv20:  {def: "log RV20 estandarizada", signo: 0}
+  REG_vix:   {def: "log VIX estandarizado", signo: 0}
+  REG_trend: {def: "1 si P > SMA200", signo: 1}
+  REG_dd:    {def: "P / máximo de 252 sesiones - 1, estandarizado", signo: 0}
+
+# Interacciones por hipótesis (A.3 fase 3 y A.12). Producto de z-scores re-estandarizado con z expansivo.
+interacciones:
+  INT_r5_rv:   {x: REV_r5,    r: REG_rv20, signo_d: -1, mecanismo: "la reversión a corto plazo es más fuerte con volatilidad alta (Nagel 2012)"}
+  INT_dvix_vix: {x: VOL_dvix5, r: REG_vix,  signo_d: 1,  mecanismo: "el rebote tras un pico de VIX es mayor con VIX alto"}
+
+inferencia:
+  nw_lags: 10                     # >= h-1 (=4); 2h para no quedarse corto
+  fase1_criterio: "|t_NW| >= 2 con el signo esperado (bilateral si signo 0) Y |t| > percentil 95 del nulo circular Y mismo signo en >= 70 % de los 6 bloques"
+  fase1_bh: "Benjamini-Hochberg al 10 % sobre los p del nulo circular de todas las candidatas (se reporta)"
+  fase1_es_filtro: false          # la fase 1 no filtra: todas las candidatas pasan a la fase 2 (tabla univariante x SHAP de A.6)
+  placebo: "regresión de y sobre x controlando r5, r21 y r252 del índice; se reporta t de x"
+  ic_horizontes: [1, 5, 10, 20]
+  terciles_quintiles: "quintiles de x con cortes expansivos del pasado (mínimo 252 sesiones)"
+  timing_univariante: "largo/neutral según signo(x * signo esperado) (signo 0: según el signo de la pendiente en todo el descubrimiento; optimista, se declara); entra en el registro"
+
+sombras:
+  desplazamiento_minimo: 252
+  excluir_bordes: 0.10
+  replicas_fase1: 500
+  copias_por_variable: 3
+  replicas_puerta: 20
+  replicas_regimen: 20
+
+clusters:
+  correlacion: "Spearman en el descubrimiento"
+  distancia: "sqrt(0.5 * (1 - |rho|)) (el valor absoluto agrupa también las variables espejo)"
+  enlace: "medio"
+  numero: "el k de 2..(n-1) que maximiza la silueta media; se reporta la silueta"
+  compuesto: "media de los z-scores alineados por signo con el primer miembro (orden de esta lista), re-estandarizada con z expansivo"
+  criterios_reportados: ["silueta > 0,5", "VIF < 5 entre compuestos", "|t| del compuesto >= |t| de su mejor miembro"]
+
+cpcv:
+  bloques: 6
+  bloques_prueba: 2               # 15 particiones, 5 trayectorias
+  purga_sesiones: 5
+  embargo_sesiones: 60
+
+clustered_mda:
+  modelo: "GBM (abajo), compuestos + 1 sombra por compuesto, 5 semillas"
+  perdida: "MSE ponderado del objetivo en el bloque de prueba"
+  permutaciones: 5
+  criterio: "sobrevive el cluster cuyo aumento medio de MSE (15 particiones) supera el percentil 95 del de las sombras"
+  sensibilidad: "ridge, reportado, no decide"
+  si_ninguno_sobrevive: "el catálogo queda vacío; la escalera, SHAP y regímenes se ejecutan con todos los compuestos como ejercicio exploratorio y se etiquetan así"
+
+modelos:
+  escalera: ["0_combo", "1_ols", "2_ridge", "3_gbm"]
+  ridge: {alphas: [0.01, 0.0316, 0.1, 0.316, 1, 3.16, 10, 31.6, 100, 316, 1000, 3162, 10000], cv: "TimeSeriesSplit(5) dentro del entrenamiento"}
+  gbm: {n_estimators: 300, learning_rate: 0.02, max_depth: 3, num_leaves: 7, min_child_samples: 200, colsample_bytree: 0.7, semillas: 5}
+  subir_de_escalon: "solo si la diferencia de pérdidas frente al escalón anterior tiene t_NW >= 2 (Clark-West si anidados) en el walk-forward Y en el CPCV agregado"
+
+puerta_skill:
+  datos: "todas las predicciones OOS del CPCV juntas (media por fecha de las 5 veces que cada fecha está en prueba)"
+  criterio: "IC de Spearman con t_NW >= 2, R2 OOS > 0 frente a la media del entrenamiento y IC por encima del percentil 95 de 20 modelos con todas las variables sustituidas por sombras"
+  si_falla: "SHAP se calcula igualmente pero se etiqueta como descripción de ruido ajustado; ninguna variable entra en el catálogo como estable"
+
+estabilidad_shap:
+  modelo: "GBM con los compuestos supervivientes + 3 sombras por compuesto; 5 semillas promediadas"
+  shap: "TreeSHAP interventional, fondo de 500 observaciones del entrenamiento, calculado en el bloque de prueba"
+  agregacion: "una curva por bloque: media de las 5 particiones en que el bloque es de prueba"
+  signo: "signo de Spearman(x, SHAP) igual al esperado en los 6 bloques (signo 0: igual en los 6 bloques)"
+  monotonia: "min sobre bloques de |rho| >= 0,7"
+  forma: "correlación media entre pares de curvas por deciles >= 0,7 (binarias: signo de la diferencia 1-0 igual en todos los bloques)"
+  relevancia: "media |SHAP| > percentil 95 de las sombras"
+  sombras: "además, monotonía y forma deben superar el percentil 95 de las de las sombras"
+  ridge: "estabilidad del signo del coeficiente en las 15 particiones"
+
+regimen:
+  modelos: {M0: "media histórica / buy & hold", M1: "compuestos supervivientes", M2: "M1 + 4 regímenes directos", M3: "M2 + 2 interacciones"}
+  modelo_principal: "ridge (interacciones lineales); GBM con interaction_constraints como sensibilidad"
+  aceptacion: "R2 OOS sube y t_NW de la diferencia de pérdidas >= 2; mejora > percentil 95 con los regímenes sustituidos por sombras; mejora en la mayoría de los folds; Sharpe neto mayor que M1 y que el buy & hold escalado por volatilidad; en walk-forward Y en CPCV"
+  interaccion: "se contrasta además el coeficiente d de r = a + b x + c R + d xR con HAC (t >= 2,5 con el signo esperado)"
+
+walk_forward:
+  tipo: "expansivo, reentreno anual, purga de 5 sesiones antes de cada test"
+  primer_test: "1997-01-01"
+  minimo_sesiones_entrenamiento: 1260
+  nota: "en descubrimiento la selección de variables (MDA en CPCV) ya ha visto estos años: es una prueba optimista. La evaluación de verdad es el holdout."
+
+estrategia:
+  regla: "largo/neutral: posición 1 si la predicción de retorno en exceso > 0 (truncado de Campbell y Thompson); 5 tramos solapados de 1/5 del capital, cada uno mantenido 5 sesiones"
+  coste_pb_por_lado: 2
+  referencias: ["buy & hold", "media histórica (largo si > 0)", "TSMOM 12-1 largo/neutral", "buy & hold escalado por volatilidad (sigma objetivo = mediana expansiva de sigma, peso máx. 2)"]
+  metricas: ["Sharpe neto", "diferencia de Sharpe con t HAC (Ledoit y Wolf 2008)", "alfa sobre mercado + TSMOM (t_NW)", "coste de break-even", "drawdown", "rotación"]
+
+sobreajuste:
+  registro: "resultados/guia1a/g1/registro_intentos.csv + serie diaria OOS de cada variante en series_oos/"
+  pbo: "CSCV con S = 16 sobre la matriz fechas x variantes del walk-forward; criterio < 0,1-0,2"
+  dsr: "ml4t-diagnostic deflated_sharpe_ratio con el total de intentos del registro; criterio > 0,95"
+
+holdout:
+  ejecucion: "una sola, con el pipeline congelado (commit previo), solo cuando el autor lo autorice"
+  criterios: "mismo signo; magnitud dentro del intervalo del descubrimiento (encogimiento 30-50 % normal); DSR aceptable"
+  subperiodos: ["2013-2022 (contaminado, ver cabecera)", "2023-2026 (virgen)"]
