@@ -1,0 +1,2 @@
+cluster,signo_esperado,signos_bloques,signo_ok,monotonia_min,p95_monotonia_sombras,forma_media,p95_forma_sombras,relevancia,p95_relevancia_sombras,monotonia_ok,forma_ok,relevancia_ok,estable_shap,ridge_signos_pos,ridge_signo_estable
+CL_TEN_mom1m,-1,"[-1, -1, -1, -1, -1, -1]",True,0.7640592244919909,0.5231667158589941,0.9231347249070686,0.7694758027300499,0.02882939944561315,0.013668378681050891,True,True,True,True,0,True

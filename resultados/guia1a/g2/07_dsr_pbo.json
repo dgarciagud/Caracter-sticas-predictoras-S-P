@@ -1,0 +1,30 @@
+{
+  "versiones": [
+    "g1",
+    "g2"
+  ],
+  "n_intentos_unicos": 41,
+  "n_intentos_wf": 18,
+  "wf": {
+    "pbo": 0.804040404040404,
+    "n_combinaciones": 12870,
+    "n_variantes": 18,
+    "dsr": 0.7540954487607946,
+    "lider": "g1:WF_sel_3_gbm",
+    "sharpe_lider": 0.14284288006538864,
+    "n_intentos": 41
+  },
+  "todo": {
+    "pbo": 0.3348096348096348,
+    "n_combinaciones": 12870,
+    "n_variantes": 40,
+    "dsr": 0.9614021851686853,
+    "lider": "g1:F1_timing_CAL_fomc",
+    "sharpe_lider": 0.4717250110215159,
+    "n_intentos": 41
+  },
+  "periodo": [
+    "1998-01-05",
+    "2012-12-24"
+  ]
+}
