@@ -213,6 +213,31 @@ def paso_modelos():
             yy = P.loc[pa.index, "y"].to_numpy()
             dw, tw = estad.dm_t(yy, pa.to_numpy(), pb.to_numpy())
             comp.append(dict(variante=vn, de=a, a=b, dif_cpcv=dc, t_cpcv=tc, dif_wf=dw, t_wf=tw, sube=bool(tc >= 2 and tw >= 2)))
+    # g2: hiperparámetros elegidos por la validación interna y variantes fijas de min_child_samples.
+    if C.GBM_G2:
+        from guia1a.cv import cpcv as _cpcv, walk_forward as _wf
+
+        Xs = X[cols].to_numpy()
+        elec = []
+        for nombre_v, parts in (("walk_forward", [(str(a), tr, te) for a, tr, te in _wf(idx)]),
+                                ("cpcv", [(str(c), tr, te) for c, tr, te in _cpcv(len(idx))])):
+            for et, tr, te in parts:
+                m_ = GBM().fit(Xs[tr], y[tr], w[tr])
+                elec.append(dict(validacion=nombre_v, particion=et, min_child_samples=m_.min_child, n_arboles=m_.n_arboles))
+        pd.DataFrame(elec).to_csv(R / "04_gbm_hiperparametros_elegidos.csv", index=False)
+        fijas = []
+        for mcs in C.GBM_G2["min_child_samples_rejilla"]:
+            fab = lambda mcs=mcs: GBM(rejilla=[mcs])  # noqa: E731
+            o = cpcv_pred(X[cols], y, w, fab)
+            g = puerta(o["agregada"], y, o["bench_agregado"])
+            p = wf_pred(X[cols], y, w, fab)
+            m, _ = _eval_wf(f"WF_sel_gbm_mcs{mcs}", f"GBM con early stopping y min_child_samples={mcs} fijo", p, est, refs,
+                            dict(variables=cols, modelo="3_gbm", fase="fase4_g2"))
+            fijas.append(dict(min_child_samples=mcs, cpcv_ic=g["ic"], cpcv_t_ic=g["t_ic"], cpcv_r2_oos=g["r2_oos"],
+                              wf_r2_oos=m["r2_oos"], wf_cw_t=m["cw_t"], wf_sharpe=m["sharpe_neto"],
+                              wf_dif_sharpe_bh=m["dif_sharpe_bh"], wf_t_dif=m["t_dif_sharpe_bh"]))
+            print("mcs", mcs, {k: round(v, 4) for k, v in fijas[-1].items()})
+        pd.DataFrame(fijas).to_csv(R / "04_gbm_rejilla_min_child.csv", index=False)
     tcomp = pd.DataFrame(comp)
     tcomp.to_csv(R / "04_escalera_comparacion.csv", index=False)
     elegido = nombres[0]
@@ -377,13 +402,11 @@ def paso_regimen():
 
 # ------------------------------------------------------------------ sobreajuste y catálogo
 def paso_sobreajuste():
-    est = estado()
-    reg = pd.read_csv(C.REGISTRO)
-    n_intentos = int((reg["validacion"] != "referencia").sum())
-    Mwf = matriz_registro("walk_forward")
-    Mtodo = pd.concat([Mwf, matriz_registro("regla_fija")], axis=1).dropna()
-    res = dict(n_intentos=n_intentos, wf=dict(**pbo_cscv(Mwf), **dsr(Mwf, n_intentos)),
-               todo=dict(**pbo_cscv(Mtodo), **dsr(Mtodo, n_intentos)), periodo=[str(Mtodo.index[0].date()), str(Mtodo.index[-1].date())])
+    Mwf, n_wf = matriz_registro("walk_forward")
+    Mtodo, n_todo = matriz_registro(("walk_forward", "regla_fija"))
+    res = dict(versiones=[*C.VERSIONES_PREVIAS, C.VERSION], n_intentos_unicos=n_todo, n_intentos_wf=n_wf,
+               wf=dict(**pbo_cscv(Mwf), **dsr(Mwf, n_todo)),
+               todo=dict(**pbo_cscv(Mtodo), **dsr(Mtodo, n_todo)), periodo=[str(Mtodo.index[0].date()), str(Mtodo.index[-1].date())])
     js(res, "07_dsr_pbo.json")
     print(res)
     catalogo()

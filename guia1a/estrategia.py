@@ -93,13 +93,36 @@ def registrar(id_: str, fase: str, descripcion: str, validacion: str, metr: dict
     df.to_csv(C.REGISTRO, index=False)
 
 
-def matriz_registro(validacion: str = "walk_forward") -> pd.DataFrame:
-    reg = pd.read_csv(C.REGISTRO)
-    reg = reg[(reg["validacion"] == validacion) & reg["serie"].notna() & (reg["serie"] != "")]
-    cols = {r.id: pd.read_parquet(C.RAIZ / r.serie)["neto_exceso"] for r in reg.itertuples()}
+def registro_conjunto() -> pd.DataFrame:
+    """Registro de esta versión + el de las versiones previas (pre-registro: versiones_previas)."""
+    regs = []
+    for v in [*C.VERSIONES_PREVIAS, C.VERSION]:
+        ruta = C.RAIZ / "resultados" / "guia1a" / v / "registro_intentos.csv"
+        if ruta.exists():
+            r = pd.read_csv(ruta)
+            r["clave"] = v + ":" + r["id"]
+            regs.append(r)
+    return pd.concat(regs, ignore_index=True)
+
+
+def matriz_registro(validacion: str | tuple = "walk_forward") -> tuple[pd.DataFrame, int]:
+    """Matriz fechas x variantes (todas las versiones). Las series idénticas entre versiones (mismo intento
+    repetido) se cuentan una sola vez. Devuelve la matriz y el número de intentos únicos con esa validación."""
+    reg = registro_conjunto()
+    vals = (validacion,) if isinstance(validacion, str) else validacion
+    reg = reg[reg["validacion"].isin(vals) & reg["serie"].notna() & (reg["serie"] != "")]
+    cols, vistos = {}, set()
+    for r in reg.itertuples():
+        s = pd.read_parquet(C.RAIZ / r.serie)["neto_exceso"]
+        firma = hash(tuple(np.round(s.to_numpy(), 12)))
+        if firma in vistos:
+            continue
+        vistos.add(firma)
+        cols[r.clave] = s
     M = pd.DataFrame(cols).dropna()
+    n = len(cols)
     # Variantes sin varianza (siempre en liquidez): cuentan como intento pero no tienen Sharpe.
-    return M.loc[:, M.std() > 1e-12]
+    return M.loc[:, M.std() > 1e-12], n
 
 
 def pbo_cscv(R: pd.DataFrame, S: int = 16) -> dict:

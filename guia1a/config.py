@@ -79,6 +79,9 @@ LGBM = dict(
     deterministic=True,
     force_row_wise=True,
 )
+# g2: early stopping y rejilla de min_child_samples elegidos dentro del entrenamiento (None en g1).
+GBM_G2: dict | None = PREREG["modelos"].get("gbm_g2")
+VERSIONES_PREVIAS: list[str] = list(PREREG.get("versiones_previas", []))
 ALPHAS_RIDGE = [float(a) for a in PREREG["modelos"]["ridge"]["alphas"]]
 
 # Llave del holdout: sin esta variable de entorno con este valor exacto el código no carga 2013+.

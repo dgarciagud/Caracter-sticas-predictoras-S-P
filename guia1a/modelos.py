@@ -57,18 +57,54 @@ class RidgeTS:
 
 
 class GBM:
-    """LightGBM pequeño y restringido; predicción = media de las semillas."""
+    """LightGBM pequeño y restringido; predicción = media de las semillas.
 
-    def __init__(self, semillas=None, interaction_constraints=None, **extra):
+    g1: hiperparámetros fijos. g2 (config.GBM_G2): número de árboles por early stopping y min_child_samples
+    elegido en una validación interna (último tramo del entrenamiento, separado con purga); después se reentrena
+    con todo el entrenamiento. `rejilla` fija la lista de min_child_samples (un solo valor = variante fija).
+    """
+
+    def __init__(self, semillas=None, interaction_constraints=None, rejilla=None, **extra):
         self.semillas = C.SEMILLAS_GBM if semillas is None else semillas
         self.params = {**C.LGBM, **extra}
         if interaction_constraints is not None:
             self.params["interaction_constraints"] = interaction_constraints
+        self.g2 = C.GBM_G2
+        self.rejilla = rejilla if rejilla is not None else (self.g2["min_child_samples_rejilla"] if self.g2 else None)
 
-    def fit(self, X, y, w):
+    def _ajustar(self, X, y, w, params):
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
-            self.ms = [lgb.LGBMRegressor(**self.params, random_state=s).fit(X, y, sample_weight=w) for s in self.semillas]
+            return [lgb.LGBMRegressor(**params, random_state=s).fit(X, y, sample_weight=w) for s in self.semillas]
+
+    def fit(self, X, y, w):
+        if not self.g2:
+            self.ms = self._ajustar(X, y, w, self.params)
+            return self
+        es = self.g2["early_stopping"]
+        n = len(y)
+        ini_val = int(n * (1 - es["fraccion_validacion"]))
+        tr, va = np.arange(0, max(1, ini_val - es["purga"])), np.arange(ini_val, n)
+        mejor = None
+        for mcs in self.rejilla:
+            p = {**self.params, "min_child_samples": int(mcs), "n_estimators": int(es["max_arboles"])}
+            preds, iters = [], []
+            with warnings.catch_warnings():
+                warnings.simplefilter("ignore")
+                for s in self.semillas:
+                    m = lgb.LGBMRegressor(**p, random_state=s).fit(
+                        X[tr], y[tr], sample_weight=w[tr], eval_set=[(X[va], y[va])], eval_sample_weight=[w[va]],
+                        callbacks=[lgb.early_stopping(int(es["paciencia"]), verbose=False)],
+                    )
+                    iters.append(max(1, int(m.best_iteration_ or p["n_estimators"])))
+                    preds.append(m.predict(X[va], num_iteration=iters[-1]))
+            mse = float(np.mean([np.average((y[va] - q) ** 2, weights=w[va]) for q in preds]))
+            # Empate (o mejora < 1e-12) -> el valor mayor, más conservador.
+            if mejor is None or mse <= mejor[0] + 1e-12:
+                mejor = (mse, int(mcs), int(np.median(iters)))
+        self.min_child, self.n_arboles = mejor[1], mejor[2]
+        p = {**self.params, "min_child_samples": self.min_child, "n_estimators": self.n_arboles}
+        self.ms = self._ajustar(X, y, w, p)
         return self
 
     def predict(self, X):
