@@ -25,6 +25,8 @@ reapertura del pre-registro tras ver la v1) y
 
 Línea 1B: [`resultados/1B/INFORME_1B.md`](resultados/1B/INFORME_1B.md) (v1: la regla no pasa la puerta; v2: regla VIX alcista, sin meta-features) y [`resultados/1B/v3/INFORME_1B_v3.md`](resultados/1B/v3/INFORME_1B_v3.md) (v3: reversión laxa −0,5σ con meta-label; regla con t 1,99, ninguna meta-feature; nula) y [`resultados/1B/v4/INFORME_1B_v4.md`](resultados/1B/v4/INFORME_1B_v4.md) (v4: barreras ±0,5σ; peor: la regla pierde la ventaja; nula).
 
+**Línea 1A según la guía del TFM** (CPCV, clustered MDA, puerta de skill, estabilidad SHAP frente a sombras, regímenes M0-M3; descubrimiento 1992-2012, holdout 2013-2026 sellado): [`resultados/guia1a/g1/INFORME_1A_guia.md`](resultados/guia1a/g1/INFORME_1A_guia.md). Pre-registro `preregistro/preregistro_1A_guia.yaml`, paquete `guia1a/`, orquestador `scripts/run_guia_1a.py`. Resultado nulo: ningún cluster cumple todos los criterios (el de reversión a corto plazo y ΔVIX falla por monotonía SHAP 0,64 < 0,7 y no bate a la media histórica en walk-forward).
+
 Metodología alternativa (screening OR + SFI/MDA): [`metodologia/METODOLOGIA_SCREENING_OR.md`](metodologia/METODOLOGIA_SCREENING_OR.md), prueba sintética en [`resultados/screening_prueba/INFORME.md`](resultados/screening_prueba/INFORME.md) y sensibilidad sobre la 1A en [`resultados/sensibilidad_screening/INFORME.md`](resultados/sensibilidad_screening/INFORME.md).
 
 Prueba de potencia de la etapa 1 (datos sintéticos): [`resultados/potencia/INFORME_POTENCIA.md`](resultados/potencia/INFORME_POTENCIA.md).
