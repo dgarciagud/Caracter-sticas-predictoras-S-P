@@ -44,7 +44,7 @@ def psr(ex: pd.Series) -> float:
     return float(deflated_sharpe_ratio(ex.dropna().to_numpy(), frequency="daily").probability)
 
 
-def evaluar(fin, inicio, subperiodos: dict, out: Path):
+def evaluar(fin, inicio, subperiodos: dict, out: Path, cols_forzadas: list[str] | None = None):
     cl = json.loads((R / "02_clusters.json").read_text())
     mods = json.loads((R / "04_modelos.json").read_text())
     tm = pd.read_csv(R / "02_mda.csv")
@@ -52,7 +52,7 @@ def evaluar(fin, inicio, subperiodos: dict, out: Path):
     elegido = mods["elegido"]
     cat = pd.read_csv(R / "08_catalogo.csv")
     estables = cat.loc[cat.decision == "estable", "cluster"].unique().tolist()
-    cols = estables or superv or list(cl["alineacion"])
+    cols = cols_forzadas or estables or superv or list(cl["alineacion"])
     print("variables:", cols, "| modelos:", sorted({elegido, "3_gbm"}))
 
     d = datos.cargar(fin)
@@ -147,6 +147,19 @@ def evaluar(fin, inicio, subperiodos: dict, out: Path):
 
 
 def main():
+    if "--exploratorio" in sys.argv:
+        # Análisis A POSTERIORI sobre el holdout ya abierto: no confirma nada, cuenta como intento y se guarda aparte.
+        if not (R / "holdout" / "ABIERTO").exists() or not C.holdout_abierto():
+            sys.exit("El modo exploratorio solo se usa con el holdout ya abierto y la llave puesta.")
+        cols = sys.argv[sys.argv.index("--exploratorio") + 1].split(",")
+        out = R / "holdout" / ("exploratorio_" + "_".join(cols))
+        out.mkdir(parents=True, exist_ok=True)
+        (out / "EXPLORATORIO").write_text(datetime.now(timezone.utc).isoformat(timespec="seconds")
+                                          + " · análisis a posteriori, no confirmatorio; cuenta como intento\n")
+        evaluar(C.HOLD_FIN, C.HOLD_INI, {"2013-2026": ("2013-01-01", "2026-12-31"),
+                                          "2013-2022 (contaminado)": ("2013-01-01", "2022-12-31"),
+                                          "2023-2026 (virgen)": ("2023-01-01", "2026-12-31")}, out, cols)
+        return
     if "--prueba" in sys.argv:
         evaluar(C.DESC_FIN, "2008-01-01", {"2008-2012 (prueba en descubrimiento)": ("2008-01-01", "2012-12-31")},
                 C.CACHE / "prueba_holdout")
