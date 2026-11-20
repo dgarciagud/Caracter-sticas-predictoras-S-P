@@ -459,8 +459,36 @@ def catalogo():
     print(cat[["variable", "cluster", "t_nw", "pasa_fase1", "sobrevive_mda", "decision", "motivo"]].to_string())
 
 
+# ------------------------------------------------------------------ walk-forward con las variables estables (A.6, paso 4)
+def paso_estables():
+    est = estado()
+    cat = pd.read_csv(R / "08_catalogo.csv")
+    estables = cat.loc[cat.decision == "estable", "cluster"].unique().tolist()
+    if not estables:
+        print("catálogo vacío: no hay walk-forward con variables estables")
+        return
+    P, idx, w = est["P"], est["idx"], est["w"]
+    y = P.loc[idx, "y"].to_numpy()
+    X = est["Xall"].loc[idx, estables]
+    refs = _refs(est)
+    res, bts = {}, {}
+    for nombre, fab in ESCALERA.items():
+        o = cpcv_pred(X, y, w, fab)
+        p = wf_pred(X, y, w, fab)
+        m, bt = _eval_wf(f"WF_estables_{nombre}", f"{nombre} sobre las variables estables {estables}", p, est, refs,
+                         dict(variables=estables, modelo=nombre, fase="fase5_estables"))
+        res[nombre] = dict(cpcv=puerta(o["agregada"], y, o["bench_agregado"]), wf=m)
+        bts[nombre] = bt
+        print(nombre, "CPCV", {k: round(v, 4) for k, v in res[nombre]["cpcv"].items()}, "| WF",
+              {k: round(m[k], 4) for k in ("r2_oos", "cw_t", "sharpe_neto", "dif_sharpe_bh", "t_dif_sharpe_bh", "alfa_anual", "t_alfa", "rotacion_anual")})
+    js(dict(estables=estables, resultados=res), "09_walk_forward_estables.json")
+    figuras.curvas_capital({f"Combinación ({', '.join(estables)})": bts["0_combo"], "GBM": bts["3_gbm"],
+                            "Buy & hold": refs["buy_hold"], "TSMOM 12-1": refs["tsmom_12_1"]},
+                           R / "figuras" / "09_curvas_estables.png", "Walk-forward 1998-2012 con las variables estables (neto de 2 pb)")
+
+
 PASOS = {"datos": paso_datos, "fase1": paso_fase1, "fase2": paso_fase2, "modelos": paso_modelos, "shap": paso_shap,
-         "regimen": paso_regimen, "sobreajuste": paso_sobreajuste, "catalogo": catalogo}
+         "regimen": paso_regimen, "estables": paso_estables, "sobreajuste": paso_sobreajuste, "catalogo": catalogo}
 
 if __name__ == "__main__":
     paso = sys.argv[1] if len(sys.argv) > 1 else "todo"

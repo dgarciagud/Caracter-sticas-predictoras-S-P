@@ -74,7 +74,7 @@ def dependencia_shap(XS: pd.DataFrame, bloques: list[pd.DataFrame], cols: list[s
             _curva(ax, x[c], S[c], SERIE[b % len(SERIE)], 1.8, f"bloque {b + 1} ({S.index[0].year}-{S.index[-1].year})")
         ax.axhline(0, color=TINTA2, lw=0.6)
         ax.set_title(c, fontsize=8.5)
-        ax.set_xlabel("compuesto z (media por decil)", fontsize=7.5)
+        ax.set_xlabel("z de la variable o compuesto (media por decil)", fontsize=7.5)
         ax.set_ylabel("SHAP (×10⁻³ de y)", fontsize=7.5)
     for ax in list(axs.flat)[n:]:
         ax.axis("off")
@@ -100,12 +100,16 @@ def _curva(ax, x, s, color, lw, label):
 def curvas_capital(bts: dict[str, pd.DataFrame], ruta, titulo):
     fig, ax = plt.subplots(figsize=(8.5, 4))
     ini = max(b.index[0] for b in bts.values())
+    finales: list[float] = []
     for i, (k, b) in enumerate(bts.items()):
         b = b.loc[ini:]
         c = (1 + b["neto"]).cumprod()
         ax.plot(c.index, c.values, color=SERIE[i], lw=2 if i == 0 else 1.6, label=k)
-        ax.annotate(k.split(" (")[0], (c.index[-1], c.values[-1]), xytext=(4, 0), textcoords="offset points",
-                    fontsize=7.5, color=TINTA2, va="center")
+        fin = float(np.log(c.values[-1]))
+        if all(abs(fin - f) > 0.04 for f in finales):  # sin etiqueta final si choca con otra (queda la leyenda)
+            ax.annotate(k.split(" (")[0], (c.index[-1], c.values[-1]), xytext=(4, 0), textcoords="offset points",
+                        fontsize=7.5, color=TINTA2, va="center")
+            finales.append(fin)
     ax.set_yscale("log")
     ax.set_ylabel("valor de 1 $ (escala log)")
     ax.set_title(titulo)

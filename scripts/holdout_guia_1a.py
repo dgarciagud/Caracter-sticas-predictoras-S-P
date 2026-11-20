@@ -1,7 +1,8 @@
 """Holdout 2013-2026 de la línea 1A (guía): UNA sola ejecución con el pipeline congelado.
 
 Requisitos: GUIA1A_HOLDOUT=ABRIR-HOLDOUT-UNA-SOLA-VEZ y que no exista resultados/guia1a/<v>/holdout/ABIERTO.
-Congelado del descubrimiento: clusters y su alineación (02_clusters.json), cluster(s) superviviente(s) del MDA,
+Congelado del descubrimiento: clusters y su alineación (02_clusters.json), variables estables del catálogo
+(08_catalogo.csv; si está vacío, los supervivientes del MDA),
 modelo elegido por la escalera (04_modelos.json), hiperparámetros del pre-registro.
 Evalúa en walk-forward expansivo con reentreno anual desde 1992 (purga de 5 sesiones) para 2013-2026 y
 reporta 2013-2022 (contaminado por la línea 1A anterior) y 2023-2026 (virgen) por separado.
@@ -52,7 +53,11 @@ def main():
     X = pd.DataFrame(index=P.index)
     for nombre, al in cl["alineacion"].items():
         X[nombre] = P[nombre] if len(al) == 1 else z_expanding(sum(s * P[m] for m, s in al.items()) / len(al))
-    cols = superv if superv else list(cl["alineacion"])
+    # A.6, paso 4: holdout con las variables estables del catálogo; si está vacío, con los supervivientes del MDA.
+    cat = pd.read_csv(R / "08_catalogo.csv")
+    estables = cat.loc[cat.decision == "estable", "cluster"].unique().tolist()
+    cols = estables or superv or list(cl["alineacion"])
+    print("variables del holdout:", cols)
     ok = pd.concat([X[cols], P["y"]], axis=1).notna().all(axis=1) & (P.index >= pd.Timestamp("1992-01-03"))
     idx = P.index[ok]
     Xv, y = X.loc[idx, cols], P.loc[idx, "y"].to_numpy()
