@@ -111,10 +111,10 @@ def evaluar(fin, inicio, subperiodos: dict, out: Path):
             filas.append(dict(subperiodo=sub, modelo=nombre, n=len(p), r2_oos=estad.r2_oos(yy, p.to_numpy(), bench),
                               cw_t=estad.clark_west(yy, bench, p.to_numpy()), ic=ic, t_ic=tic,
                               psr=psr(bt["neto"] - bt["rf"]), **m))
-            series[nombre] = bt
         for k, bt in refs.items():
             btk = bt.loc[a:b]
             filas.append(dict(subperiodo=sub, modelo=k, psr=psr(btk["neto"] - btk["rf"]), **metricas(btk)))
+    series = dict(bts)  # series completas del periodo de prueba (no las del último subperiodo)
     # Año a año (modelo elegido frente al buy & hold).
     anual = []
     be = bts[elegido]

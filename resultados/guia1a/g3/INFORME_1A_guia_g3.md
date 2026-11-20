@@ -1,5 +1,9 @@
 # Línea 1A según la guía · versión g3: variables individuales
 
+> **Holdout abierto el 2026-11-20 ([informe](holdout/INFORME_HOLDOUT.md)): REV_r5 no se confirma.** Mantiene el
+> signo en 2013-2026, pero su pendiente encoge un 57 % y no es significativa. El modelo elegido no bate a la media
+> histórica (R² −0,12 %), y la estrategia queda por debajo del buy & hold (Sharpe 0,56 frente a 0,69).
+
 **Tercera versión, reapertura declarada de g2** ([informe g1](../g1/INFORME_1A_guia.md),
 [informe g2](../g2/INFORME_1A_guia_g2.md)). Se escribió después de ver g1 y g2, a petición del autor. El pre-registro
 es [`preregistro/preregistro_1A_guia_g3.yaml`](../../../preregistro/preregistro_1A_guia_g3.yaml), con commit
@@ -160,7 +164,7 @@ Catálogo completo en [`08_catalogo.csv`](08_catalogo.csv).
 | 5 | Bate a la media histórica y aporta frente a TSMOM | R² WF +0,36 %, Clark-West t 2,49; alfa sobre TSMOM t 2,63 | ✔ |
 | 6 | Valor económico neto de costes | Sharpe 0,28 frente a 0,10 (t 2,48); break-even 15 pb | ✔ |
 | 7 | Robusta: PBO bajo, DSR alto | PBO 0,22; DSR 0,92 | ✘ (por poco) |
-| 8 | Se confirma en el holdout y tiene mecanismo | mecanismo: provisión de liquidez (Nagel, 2012); holdout sin abrir | pendiente |
+| 8 | Se confirma en el holdout y tiene mecanismo | mecanismo: provisión de liquidez (Nagel, 2012); holdout: mismo signo, pero encoge un 57 %, no es significativo y no bate al buy & hold | ✘ |
 
 ## 9 · Advertencias para la memoria del TFM
 
