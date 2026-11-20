@@ -37,8 +37,9 @@ def dendrograma(info: dict, ruta):
     ax[0].grid(False)
     ks, s = zip(*sorted(info["siluetas"].items()))
     ax[1].plot(ks, s, color=SERIE[0], marker="o", ms=4)
-    ax[1].axvline(info["k"], color=GRIS, lw=1, ls="--")
-    ax[1].set_title(f"Silueta media (k elegido = {info['k']})")
+    ks_ = info.get("k_silueta", info["k"])
+    ax[1].axvline(ks_, color=GRIS, lw=1, ls="--")
+    ax[1].set_title(f"Silueta media (máx. en k = {ks_})" + (" · no se usa (g3)" if info.get("modo") == "individuales" else ""))
     ax[1].set_xlabel("número de clusters")
     _guardar(fig, ruta)
 

@@ -121,7 +121,7 @@ def paso_fase2():
     tcl["vif"] = fase2.vif(X).reindex(tcl.cluster).to_numpy()
     tcl.to_csv(R / "02_clusters.csv", index=False)
     info["rho"].to_csv(R / "02_spearman.csv")
-    js(dict(k=info["k"], silueta=info["silueta"], siluetas=info["siluetas"], alineacion=alin), "02_clusters.json")
+    js(dict(k=info["k"], modo=info.get("modo", "silueta"), k_silueta=info.get("k_silueta", info["k"]), silueta=info["silueta"], siluetas=info["siluetas"], alineacion=alin), "02_clusters.json")
     # Clustered MDA: compuestos + 1 sombra por compuesto.
     Sh = fase2.sombras(X, 1, C.SEMILLA + 1)
     XM = pd.concat([X, Sh], axis=1)

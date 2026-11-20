@@ -42,6 +42,10 @@ def clusters(Pd: pd.DataFrame) -> tuple[dict[str, list[str]], dict]:
         nombre = miembros[0] if len(miembros) == 1 else "CL_" + miembros[0]
         out[nombre] = miembros
     info = dict(k=k, silueta=sil[k], siluetas=sil, rho=rho, D=D, linkage=Z, cand=cand)
+    if C.PREREG["clusters"].get("modo") == "individuales":
+        # g3: sin compuestos; la partición por silueta solo se reporta (k_silueta).
+        info.update(k_silueta=k, k=len(cand), modo="individuales")
+        out = {c: [c] for c in cand}
     return out, info
 
 
